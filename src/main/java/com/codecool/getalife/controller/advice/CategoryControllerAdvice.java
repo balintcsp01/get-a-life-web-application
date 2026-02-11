@@ -21,7 +21,6 @@ public class CategoryControllerAdvice {
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 LocalDateTime.now()
-
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
