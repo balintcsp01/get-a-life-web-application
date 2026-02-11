@@ -1,7 +1,6 @@
 package com.codecool.getalife.repository;
 
 import com.codecool.getalife.model.User;
-import com.codecool.getalife.model.dto.user.UserResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

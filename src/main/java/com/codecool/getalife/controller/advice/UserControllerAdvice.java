@@ -1,7 +1,6 @@
 package com.codecool.getalife.controller.advice;
 
 import com.codecool.getalife.controller.UserController;
-import com.codecool.getalife.exception.categories.CategoryDuplicateException;
 import com.codecool.getalife.exception.user.UserDuplicateException;
 import com.codecool.getalife.exception.user.UserNotFoundException;
 import com.codecool.getalife.model.dto.error.ErrorResponse;

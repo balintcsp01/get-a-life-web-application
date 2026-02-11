@@ -17,7 +17,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CategoryRepository categoryRepository;
 
     public UserResponse create(UserCreateRequest req) {
 
