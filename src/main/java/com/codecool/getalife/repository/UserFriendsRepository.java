@@ -16,7 +16,7 @@ public interface UserFriendsRepository extends JpaRepository<UserFriends, Long> 
             else uf.userId1
            end
         from UserFriends uf
-        where uf.userId1 = :userId or uf.userId2 = :userId 
+        where uf.userId1 = :userId or uf.userId2 = :userId
     """)
     List<Long> findFriendsIdsByUserId(@Param("userId") Long userId);
 
