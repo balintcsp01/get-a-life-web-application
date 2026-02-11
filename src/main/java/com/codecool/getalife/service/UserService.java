@@ -5,7 +5,6 @@ import com.codecool.getalife.exception.user.UserNotFoundException;
 import com.codecool.getalife.model.User;
 import com.codecool.getalife.model.dto.user.UserCreateRequest;
 import com.codecool.getalife.model.dto.user.UserResponse;
-import com.codecool.getalife.repository.CategoryRepository;
 import com.codecool.getalife.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
