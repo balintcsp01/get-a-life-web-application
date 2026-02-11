@@ -9,6 +9,7 @@ import com.codecool.getalife.model.dto.user.UserFriendResponse;
 import com.codecool.getalife.repository.UserFriendsRepository;
 import com.codecool.getalife.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,16 +51,17 @@ public class UserFriendService {
         Long user1 = userId.compareTo(friendId) < 0 ? userId : friendId;
         Long user2 = userId.compareTo(friendId) < 0 ? friendId : userId;
 
-        if (userFriendsRepository.findFriendship(user1, user2).isPresent()) {
+        try {
+            UserFriends friendship = UserFriends.builder()
+                    .userId1(user1)
+                    .userId2(user2)
+                    .build();
+
+            userFriendsRepository.save(friendship);
+
+        } catch (DataIntegrityViolationException ex) {
             throw new UserFriendAlreadyExistsException(user1, user2);
         }
-
-        UserFriends friendship = UserFriends.builder()
-                .userId1(user1)
-                .userId2(user2)
-                .build();
-
-        userFriendsRepository.save(friendship);
     }
 
     public void removeFriend(Long userId, Long friendId) {

@@ -7,6 +7,7 @@ import com.codecool.getalife.model.dto.user.UserCreateRequest;
 import com.codecool.getalife.model.dto.user.UserResponse;
 import com.codecool.getalife.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,26 +20,24 @@ public class UserService {
 
     public UserResponse create(UserCreateRequest req) {
 
-        if (userRepository.existsByEmailIgnoreCase(req.email())) {
-            throw new UserDuplicateException("Email is already in use: " + req.email());
+        try {
+            String hashedPassword = passwordEncoder.encode(req.password());
+
+            User saved = userRepository.save(
+                    User.builder()
+                            .name(req.name())
+                            .email(req.email())
+                            .password_hash(hashedPassword)
+                            .build()
+            );
+
+            return toResponse(saved);
+        } catch (DataIntegrityViolationException ex) {
+            throw new UserDuplicateException("Email or username already in use");
         }
-
-        if (userRepository.existsByNameIgnoreCase(req.name())) {
-            throw new UserDuplicateException("Username is already in use: " + req.name());
-        }
-
-        String hashedPassword = passwordEncoder.encode(req.password());
-
-        User saved = userRepository.save(
-                User.builder()
-                        .name(req.name())
-                        .email(req.email())
-                        .password_hash(hashedPassword)
-                        .build()
-        );
-
-        return toResponse(saved);
     }
+
+
 
     public UserResponse get(Long id) {
         User user = userRepository.findUserById(id)
