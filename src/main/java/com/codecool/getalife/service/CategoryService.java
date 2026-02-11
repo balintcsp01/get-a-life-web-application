@@ -1,9 +1,10 @@
 package com.codecool.getalife.service;
 
-import com.codecool.getalife.exception.categories.CategoryDoesNotExistsException;
+import com.codecool.getalife.exception.categories.CategoryDuplicateException;
+import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.model.Category;
-import com.codecool.getalife.model.dto.Category.CategoryCreateRequest;
-import com.codecool.getalife.model.dto.Category.CategoryNameResponse;
+import com.codecool.getalife.model.dto.category.CategoryCreateRequest;
+import com.codecool.getalife.model.dto.category.CategoryNameResponse;
 import com.codecool.getalife.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,16 +19,21 @@ public class CategoryService {
 
     public Category get(String name) {
         return categoryRepository.findCategoryByName(name).orElseThrow(
-                () -> new CategoryDoesNotExistsException(name));
+                () -> new CategoryNotFoundException(name));
     }
 
     public CategoryNameResponse get(Long id) {
         return categoryRepository.findCategoryById(id).orElseThrow(
-                () -> new CategoryDoesNotExistsException(id.toString())
+                () -> new CategoryNotFoundException(id.toString())
         );
     }
 
     public CategoryNameResponse create(CategoryCreateRequest req) {
+
+        if (categoryRepository.existsCategoryByNameIgnoreCase(req.name())) {
+            throw new CategoryDuplicateException(req.name());
+        }
+
         Category saved = categoryRepository.save(
                 Category.builder()
                         .name(req.name())

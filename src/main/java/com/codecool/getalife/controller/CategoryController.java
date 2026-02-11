@@ -1,8 +1,8 @@
-package com.codecool.getalife.Controller;
+package com.codecool.getalife.controller;
 
 
-import com.codecool.getalife.model.dto.Category.CategoryCreateRequest;
-import com.codecool.getalife.model.dto.Category.CategoryNameResponse;
+import com.codecool.getalife.model.dto.category.CategoryCreateRequest;
+import com.codecool.getalife.model.dto.category.CategoryNameResponse;
 import com.codecool.getalife.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
