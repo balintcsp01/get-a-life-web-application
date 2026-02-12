@@ -39,6 +39,7 @@ public class CategoryService {
         );
 
         return new CategoryNameResponse(
+                saved.getId(),
                 saved.getName()
         );
     }
@@ -51,6 +52,6 @@ public class CategoryService {
     }
 
     private CategoryNameResponse toResponse(Category category) {
-        return new CategoryNameResponse(category.getName());
+        return new CategoryNameResponse(category.getId(), category.getName());
     }
 }
