@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { suggestionApi, hobbyApi, categoryApi } from '../../services/api';
+import { suggestionApi, hobbyApi, categoryApi } from '../services/api.js';
 
 function SuggestionSection() {
   const [suggestions, setSuggestions] = useState([]);

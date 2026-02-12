@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { categoryApi } from '../../services/api';
+import { categoryApi } from '../services/api.js';
 
 function CategorySection() {
   const [categories, setCategories] = useState([]);

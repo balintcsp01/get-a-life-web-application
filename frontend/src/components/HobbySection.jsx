@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { categoryApi, hobbyApi } from '../../services/api';
+import { categoryApi, hobbyApi } from '../services/api.js';
 
 function HobbySection() {
   const initialFormState = {

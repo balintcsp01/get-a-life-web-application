@@ -87,10 +87,10 @@ function Hobbies(){
     }, [])
 
     return(
-        <>
+        <div className="p-4" data-theme="retro">
             {loading && <h1>Loading...</h1>}
             {error && <h2>error</h2>}
-            <div>
+            <div className={"flex flex-wrap gap-2 mb-4"}>
                 <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
                     <option key={"all"} value="all">All</option>
                     {categories.map(category => <option key={category.name} value={category.name.toLowerCase()}>{category.name}</option>)}
@@ -115,10 +115,10 @@ function Hobbies(){
                     <option value="expensive">Price high to low</option>
                 </select>
             </div>
-            <div>
+            <div className="flex flex-wrap gap-4">
                 {filteredHobbies && filteredHobbies.map(hobby => <HobbyCard key={hobby.id} hobby={hobby}/>)}
             </div>
-        </>
+        </div>
     );
 
 }
