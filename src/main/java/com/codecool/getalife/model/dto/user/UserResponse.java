@@ -1,6 +1,7 @@
 package com.codecool.getalife.model.dto.user;
 
 public record UserResponse (
-   String name,
-   String email
+        Long id,
+        String name,
+        String email
 ) {}

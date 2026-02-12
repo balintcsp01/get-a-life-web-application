@@ -8,12 +8,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<Set<UserResponse>> getAll() {
+        return ResponseEntity.ok(userService.getAll());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> get(

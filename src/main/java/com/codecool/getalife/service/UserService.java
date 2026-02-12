@@ -11,6 +11,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -37,8 +41,6 @@ public class UserService {
         }
     }
 
-
-
     public UserResponse get(Long id) {
         User user = userRepository.findUserById(id)
                 .orElseThrow(() -> new UserNotFoundException(id.toString())
@@ -47,8 +49,16 @@ public class UserService {
         return toResponse(user);
     }
 
+    public Set<UserResponse> getAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toSet());
+    }
+
     private UserResponse toResponse (User user) {
         return new UserResponse(
+                user.getId(),
                 user.getName(),
                 user.getEmail()
         );
