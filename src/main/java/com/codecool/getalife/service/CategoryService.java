@@ -9,7 +9,8 @@ import com.codecool.getalife.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,15 +18,12 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public Category get(String name) {
-        return categoryRepository.findCategoryByName(name).orElseThrow(
-                () -> new CategoryNotFoundException(name));
-    }
-
     public CategoryNameResponse get(Long id) {
-        return categoryRepository.findCategoryById(id).orElseThrow(
+        var category = categoryRepository.findById(id).orElseThrow(
                 () -> new CategoryNotFoundException(id.toString())
         );
+
+        return toResponse(category);
     }
 
     public CategoryNameResponse create(CategoryCreateRequest req) {
@@ -45,12 +43,14 @@ public class CategoryService {
         );
     }
 
-    public List<CategoryNameResponse> getAll() {
+    public Set<CategoryNameResponse> getAll() {
         return categoryRepository.findAll()
                 .stream()
-                .map(category -> new CategoryNameResponse(
-                        category.getName()
-                ))
-                .toList();
+                .map(this::toResponse)
+                .collect(Collectors.toSet());
+    }
+
+    private CategoryNameResponse toResponse(Category category) {
+        return new CategoryNameResponse(category.getName());
     }
 }
