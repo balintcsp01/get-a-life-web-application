@@ -98,13 +98,13 @@ function Hobbies(){
                 <input
                     type="number"
                     placeholder="Minimum price"
-                    value={priceFilterMin}
+
                     onChange={(e) => setPriceFilterMin(e.target.value)}
                 />
                 <input
                     type="number"
                     placeholder="Maximum price"
-                    value={priceFilterMax}
+
                     onChange={(e) => setPriceFilterMax(e.target.value)}
                 />
                 <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
