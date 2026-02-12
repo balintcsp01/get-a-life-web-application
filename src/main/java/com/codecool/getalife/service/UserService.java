@@ -5,9 +5,7 @@ import com.codecool.getalife.exception.user.UserDuplicateException;
 import com.codecool.getalife.exception.user.UserNotFoundException;
 import com.codecool.getalife.model.Hobby;
 import com.codecool.getalife.model.User;
-import com.codecool.getalife.model.dto.category.CategoryNameResponse;
 import com.codecool.getalife.model.dto.hobby.HobbyIdResponse;
-import com.codecool.getalife.model.dto.hobby.HobbyResponse;
 import com.codecool.getalife.model.dto.user.UserCreateRequest;
 import com.codecool.getalife.model.dto.user.UserResponse;
 import com.codecool.getalife.repository.HobbyRepository;
@@ -17,7 +15,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
