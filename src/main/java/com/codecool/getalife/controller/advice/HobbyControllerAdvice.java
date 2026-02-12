@@ -1,6 +1,7 @@
 package com.codecool.getalife.controller.advice;
 
 import com.codecool.getalife.controller.HobbyController;
+import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
 import com.codecool.getalife.exception.hobby.HobbyNotFoundException;
 import com.codecool.getalife.model.dto.error.ErrorResponse;
@@ -37,5 +38,17 @@ public class HobbyControllerAdvice {
         );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryNotFound(CategoryNotFoundException ex) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }

@@ -40,27 +40,26 @@ public class HobbyService {
     }
 
     public HobbyResponse create(HobbyCreateRequest req) {
+        if (hobbyRepository.existsByNameIgnoreCase(req.name())) {
+            throw new HobbyDuplicateException(req.name());
+        }
+
         Set<Category> categories = req.categoryIds()
                 .stream()
                 .map(id -> categoryRepository.findById(id)
                         .orElseThrow(() -> new CategoryNotFoundException(id.toString())))
                 .collect(Collectors.toSet());
 
-        try {
-            Hobby saved = hobbyRepository.save(Hobby.builder()
-                    .name(req.name())
-                    .description(req.description())
-                    .min_price(req.minPrice())
-                    .max_price(req.maxPrice())
-                    .categories(categories)
-                    .build());
-            return toResponse(saved);
-        } catch (Exception e) {
-            throw new HobbyDuplicateException(req.name());
-        }
+        Hobby hobby = Hobby.builder()
+                .name(req.name())
+                .description(req.description())
+                .min_price(req.minPrice())
+                .max_price(req.maxPrice())
+                .categories(categories)
+                .build();
 
-
-
+        Hobby savedHobby = hobbyRepository.save(hobby);
+        return toResponse(savedHobby);
     }
 
     private HobbyResponse toResponse(Hobby hobby) {
