@@ -2,9 +2,11 @@ import {Link} from "react-router-dom";
 
 function HobbyCard({hobby}){
     return(
-        <div>
-            <Link to={`/hobbies/${hobby.id}`}><h3>{hobby.name}</h3></Link>
-        </div>
+        <Link to={`/hobbies/${hobby.id}`}>
+            <div className="card w-64 bg-base-100 shadow-md">
+                <h3 className="card-title">{hobby.name}</h3>
+            </div>
+        </Link>
     )
 
 }

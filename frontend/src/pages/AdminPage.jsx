@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import HobbySection from './HobbySection.jsx';
-import CategorySection from './CategorySection.jsx';
-import SuggestionSection from './SuggestionSection.jsx';
+import HobbySection from '../components/HobbySection.jsx';
+import CategorySection from '../components/CategorySection.jsx';
+import SuggestionSection from '../components/SuggestionSection.jsx';
 
 const AdminPage = () => {
   const [view, setView] = useState('hobbies');
