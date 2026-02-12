@@ -27,7 +27,7 @@ public class HobbyController {
     }
 
     @PostMapping
-    public ResponseEntity<HobbyResponse> create(@RequestBody HobbyCreateRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(hobbyService.create(request));
+    public ResponseEntity<HobbyResponse> create(@RequestBody HobbyCreateRequest req) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(hobbyService.create(req));
     }
 }
