@@ -5,8 +5,8 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     return (
-        <div className="sticky top-0 z-50 w-full" data-theme="retro">
-            <div className="navbar bg-base-100 shadow-md px-4">
+        <div className="sticky top-0 z-50 w-screen" data-theme="retro">
+            <div className="navbar bg-base-300 shadow-md px-4">
                 <div className="flex-1">
                     <Link to="/" className="text-xl font-bold">Get a life</Link>
                 </div>
