@@ -1,7 +1,7 @@
 package com.codecool.getalife.service;
 
-import com.codecool.getalife.exception.categories.CategoryDuplicateException;
 import com.codecool.getalife.exception.categories.CategoryNotFoundException;
+import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
 import com.codecool.getalife.exception.hobby.HobbyNotFoundException;
 import com.codecool.getalife.model.Category;
 import com.codecool.getalife.model.Hobby;
@@ -40,26 +40,27 @@ public class HobbyService {
     }
 
     public HobbyResponse create(HobbyCreateRequest req) {
-
-        if (categoryRepository.existsCategoryByNameIgnoreCase(req.name())) {
-            throw new CategoryDuplicateException(req.name());
-        }
         Set<Category> categories = req.categoryIds()
                 .stream()
                 .map(id -> categoryRepository.findById(id)
                         .orElseThrow(() -> new CategoryNotFoundException(id.toString())))
                 .collect(Collectors.toSet());
 
-        Hobby hobby = Hobby.builder()
-                .name(req.name())
-                .description(req.description())
-                .min_price(req.minPrice())
-                .max_price(req.maxPrice())
-                .categories(categories)
-                .build();
+        try {
+            Hobby saved = hobbyRepository.save(Hobby.builder()
+                    .name(req.name())
+                    .description(req.description())
+                    .min_price(req.minPrice())
+                    .max_price(req.maxPrice())
+                    .categories(categories)
+                    .build());
+            return toResponse(saved);
+        } catch (Exception e) {
+            throw new HobbyDuplicateException(req.name());
+        }
 
-        Hobby savedHobby = hobbyRepository.save(hobby);
-        return toResponse(savedHobby);
+
+
     }
 
     private HobbyResponse toResponse(Hobby hobby) {
