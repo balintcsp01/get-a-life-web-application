@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/category")
@@ -25,7 +25,7 @@ public class CategoryController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<CategoryNameResponse>> getAll() {
+    public ResponseEntity<Set<CategoryNameResponse>> getAll() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
