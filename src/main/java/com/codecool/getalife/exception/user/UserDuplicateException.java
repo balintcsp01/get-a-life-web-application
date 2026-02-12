@@ -1,7 +1,7 @@
 package com.codecool.getalife.exception.user;
 
 public class UserDuplicateException extends RuntimeException {
-    public UserDuplicateException(String message) {
-        super(message);
+    public UserDuplicateException() {
+        super("Email or username already in use");
     }
 }

@@ -33,7 +33,7 @@ public class UserService {
 
             return toResponse(saved);
         } catch (DataIntegrityViolationException ex) {
-            throw new UserDuplicateException("Email or username already in use");
+            throw new UserDuplicateException();
         }
     }
 
