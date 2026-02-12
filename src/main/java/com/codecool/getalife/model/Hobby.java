@@ -19,6 +19,9 @@ public class Hobby extends BaseEntity {
     @Column(nullable = false, length = 32, unique = true)
     private String name;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 

@@ -11,8 +11,10 @@ import com.codecool.getalife.model.dto.hobby.HobbyCreateRequest;
 import com.codecool.getalife.model.dto.hobby.HobbyResponse;
 import com.codecool.getalife.repository.CategoryRepository;
 import com.codecool.getalife.repository.HobbyRepository;
+import com.codecool.getalife.service.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class HobbyService {
 
     private final HobbyRepository hobbyRepository;
     private final CategoryRepository categoryRepository;
+    private final FileStorageService fileStorageService;
 
 
     public Set<HobbyResponse> getAll() {
@@ -40,7 +43,7 @@ public class HobbyService {
         return toResponse(hobby);
     }
 
-    public HobbyResponse create(HobbyCreateRequest req) {
+    public HobbyResponse create(HobbyCreateRequest req, MultipartFile img) {
         if (hobbyRepository.existsByNameIgnoreCase(req.name())) {
             throw new HobbyDuplicateException(req.name());
         }
@@ -48,6 +51,8 @@ public class HobbyService {
         if (req.categoryIds() == null || req.categoryIds().isEmpty()) {
             throw new HobbyMissingCategoryException();
         }
+
+        String imagePath = fileStorageService.store(img);
 
         Set<Category> categories = req.categoryIds()
                 .stream()
@@ -57,6 +62,7 @@ public class HobbyService {
 
         Hobby hobby = Hobby.builder()
                 .name(req.name())
+                .imagePath(imagePath)
                 .description(req.description())
                 .min_price(req.minPrice())
                 .max_price(req.maxPrice())
@@ -71,6 +77,7 @@ public class HobbyService {
 
         return new HobbyResponse(
                 hobby.getName(),
+                "/images/" + hobby.getImagePath(),
                 hobby.getDescription(),
                 hobby.getCategories()
                         .stream()

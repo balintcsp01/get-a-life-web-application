@@ -5,8 +5,10 @@ import com.codecool.getalife.model.dto.hobby.HobbyResponse;
 import com.codecool.getalife.service.HobbyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
@@ -26,8 +28,10 @@ public class HobbyController {
         return ResponseEntity.ok(hobbyService.get(id));
     }
 
-    @PostMapping
-    public ResponseEntity<HobbyResponse> create(@RequestBody HobbyCreateRequest req) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(hobbyService.create(req));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<HobbyResponse> create(
+            @RequestPart("hobby") HobbyCreateRequest req,
+            @RequestPart("image") MultipartFile img) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(hobbyService.create(req, img));
     }
 }
