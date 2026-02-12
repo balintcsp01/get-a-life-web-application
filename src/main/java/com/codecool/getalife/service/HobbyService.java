@@ -2,6 +2,7 @@ package com.codecool.getalife.service;
 
 import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
+import com.codecool.getalife.exception.hobby.HobbyMissingCategoryException;
 import com.codecool.getalife.exception.hobby.HobbyNotFoundException;
 import com.codecool.getalife.model.Category;
 import com.codecool.getalife.model.Hobby;
@@ -40,27 +41,30 @@ public class HobbyService {
     }
 
     public HobbyResponse create(HobbyCreateRequest req) {
+        if (hobbyRepository.existsByNameIgnoreCase(req.name())) {
+            throw new HobbyDuplicateException(req.name());
+        }
+
+        if (req.categoryIds() == null || req.categoryIds().isEmpty()) {
+            throw new HobbyMissingCategoryException();
+        }
+
         Set<Category> categories = req.categoryIds()
                 .stream()
                 .map(id -> categoryRepository.findById(id)
                         .orElseThrow(() -> new CategoryNotFoundException(id.toString())))
                 .collect(Collectors.toSet());
 
-        try {
-            Hobby saved = hobbyRepository.save(Hobby.builder()
-                    .name(req.name())
-                    .description(req.description())
-                    .min_price(req.minPrice())
-                    .max_price(req.maxPrice())
-                    .categories(categories)
-                    .build());
-            return toResponse(saved);
-        } catch (Exception e) {
-            throw new HobbyDuplicateException(req.name());
-        }
+        Hobby hobby = Hobby.builder()
+                .name(req.name())
+                .description(req.description())
+                .min_price(req.minPrice())
+                .max_price(req.maxPrice())
+                .categories(categories)
+                .build();
 
-
-
+        Hobby savedHobby = hobbyRepository.save(hobby);
+        return toResponse(savedHobby);
     }
 
     private HobbyResponse toResponse(Hobby hobby) {
