@@ -14,15 +14,15 @@ function Hobbies(){
     useEffect(() => {
         const fetchHobbies = async () => {
             setLoading(true);
-            /*try{
+            try{
                 const response = await fetch("/api/hobbies");
                 const data = await response.json();
                 const loaded = data ? Object.keys(data).map((id) => ({id, ...data[id]})) : [];
                 setHobbies(loaded);
             } catch (e){
                 setError(e.message);
-            }*/
-            setHobbies([
+            }
+            /*setHobbies([
                     { id: 1, name: "Futás", category: "sport", price: 0, description: "Kardió edzés a szabadban." },
                     { id: 2, name: "Úszás", category: "sport", price: 15, description: "Medencében vagy nyílt vízben való úszás." },
                     { id: 3, name: "Festés", category: "kreativ", price: 25, description: "Akril vagy olajfestés vászonra." },
@@ -33,7 +33,7 @@ function Hobbies(){
                     { id: 8, name: "Tánc", category: "sport", price: 30, description: "Különböző táncstílusok gyakorlása." },
                     { id: 9, name: "Kertészkedés", category: "kreativ", price: 10, description: "Növények nevelése és gondozása." },
                     { id: 10, name: "Blogírás", category: "tech", price: 0, description: "Írás és tartalomkészítés az interneten." }
-                ]);
+                ]);*/
             setLoading(false);
             setFilteredHobbies(hobbies);
             console.log(filteredHobbies);
@@ -73,15 +73,15 @@ function Hobbies(){
 
     useEffect(() => {
         const fetchCategories = async() => {
-            /*try{
+            try{
                 const response = await fetch("/api/categories");
                 const data = await response.json();
                 const loaded = data ? Object.keys(data).map((id) => ({id, ...data[id]})) : [];
                 setCategories(loaded);
             } catch (e){
                 setError(e.message);
-            }*/
-            setCategories([{name:"sport"}, {name:"kreativ"}, {name:"tech"}, {name:"wellness"}]);
+            }
+            /*setCategories([{name:"sport"}, {name:"kreativ"}, {name:"tech"}, {name:"wellness"}]);*/
         }
         fetchCategories();
     }, [])
