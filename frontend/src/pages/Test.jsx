@@ -1,7 +1,6 @@
-import './App.css'
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
-function App() {
+function Test(){
     const [status, setStatus] = useState("Idle");
     const [response, setResponse] = useState(null);
     const [error, setError] = useState(null);
@@ -25,7 +24,7 @@ function App() {
         }
     };
 
-    // Optional: auto-ping on load
+// Optional: auto-ping on load
     useEffect(() => {
         pingServer();
     }, []);
@@ -53,4 +52,4 @@ function App() {
     );
 }
 
-export default App;
+export default Test;
