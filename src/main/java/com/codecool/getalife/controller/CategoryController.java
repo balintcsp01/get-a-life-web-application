@@ -9,33 +9,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
 
+    @GetMapping
+    public ResponseEntity<Set<CategoryNameResponse>> getAll() {
+        return ResponseEntity.ok(categoryService.getAll());
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryNameResponse> get(
-    @PathVariable Long id
-    ) {
+    public ResponseEntity<CategoryNameResponse> get(@PathVariable Long id) {
 
         CategoryNameResponse response = categoryService.get(id);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<CategoryNameResponse>> getAll() {
-        return ResponseEntity.ok(categoryService.getAll());
-    }
-
     @PostMapping
-    public ResponseEntity<CategoryNameResponse> create(
-            @RequestBody CategoryCreateRequest req
-    ) {
-        var response = categoryService.create(req);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<CategoryNameResponse> create(@RequestBody CategoryCreateRequest req) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(req));
     }
 }
