@@ -1,6 +1,7 @@
 package com.codecool.getalife.controller.advice;
 
 import com.codecool.getalife.controller.HobbyController;
+import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
 import com.codecool.getalife.exception.hobby.HobbyNotFoundException;
 import com.codecool.getalife.model.dto.error.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -24,5 +25,17 @@ public class HobbyControllerAdvice {
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(HobbyDuplicateException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicate(HobbyDuplicateException ex) {
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }
