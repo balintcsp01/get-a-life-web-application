@@ -2,6 +2,7 @@ package com.codecool.getalife.service;
 
 import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
+import com.codecool.getalife.exception.hobby.HobbyMissingCategoryException;
 import com.codecool.getalife.exception.hobby.HobbyNotFoundException;
 import com.codecool.getalife.model.Category;
 import com.codecool.getalife.model.Hobby;
@@ -42,6 +43,10 @@ public class HobbyService {
     public HobbyResponse create(HobbyCreateRequest req) {
         if (hobbyRepository.existsByNameIgnoreCase(req.name())) {
             throw new HobbyDuplicateException(req.name());
+        }
+
+        if (req.categoryIds() == null || req.categoryIds().isEmpty()) {
+            throw new HobbyMissingCategoryException();
         }
 
         Set<Category> categories = req.categoryIds()
