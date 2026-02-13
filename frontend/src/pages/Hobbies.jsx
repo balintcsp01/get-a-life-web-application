@@ -23,16 +23,16 @@ function Hobbies(){
                 setError(e.message);
             }
             /*setHobbies([
-                    { id: 1, name: "Futás", category: "sport", price: 0, description: "Kardió edzés a szabadban." },
-                    { id: 2, name: "Úszás", category: "sport", price: 15, description: "Medencében vagy nyílt vízben való úszás." },
-                    { id: 3, name: "Festés", category: "kreativ", price: 25, description: "Akril vagy olajfestés vászonra." },
-                    { id: 4, name: "Fotózás", category: "kreativ", price: 50, description: "Képek készítése és szerkesztése." },
-                    { id: 5, name: "Programozás", category: "tech", price: 0, description: "Kódolás különböző nyelveken." },
-                    { id: 6, name: "Robotika", category: "tech", price: 100, description: "Robotok építése és programozása." },
-                    { id: 7, name: "Jóga", category: "wellness", price: 20, description: "Test és lélek harmóniája." },
-                    { id: 8, name: "Tánc", category: "sport", price: 30, description: "Különböző táncstílusok gyakorlása." },
-                    { id: 9, name: "Kertészkedés", category: "kreativ", price: 10, description: "Növények nevelése és gondozása." },
-                    { id: 10, name: "Blogírás", category: "tech", price: 0, description: "Írás és tartalomkészítés az interneten." }
+                    { id: 1, name: "Futás", category: "sport", min_price: 0, max_price: 10, description: "Kardió edzés a szabadban." },
+                    { id: 2, name: "Úszás", category: "sport", min_price: 15, max_price: 20,description: "Medencében vagy nyílt vízben való úszás." },
+                    { id: 3, name: "Festés", category: "kreativ", min_price: 25, max_price: 35,description: "Akril vagy olajfestés vászonra." },
+                    { id: 4, name: "Fotózás", category: "kreativ", min_price: 50, max_price: 100,description: "Képek készítése és szerkesztése." },
+                    { id: 5, name: "Programozás", category: "tech", min_price: 0, max_price: 50,description: "Kódolás különböző nyelveken." },
+                    { id: 6, name: "Robotika", category: "tech", min_price: 100, max_price: 200,description: "Robotok építése és programozása." },
+                    { id: 7, name: "Jóga", category: "wellness", min_price: 20, max_price: 50,description: "Test és lélek harmóniája." },
+                    { id: 8, name: "Tánc", category: "sport", min_price: 30, max_price: 50,description: "Különböző táncstílusok gyakorlása." },
+                    { id: 9, name: "Kertészkedés", category: "kreativ", min_price: 10, max_price: 20,description: "Növények nevelése és gondozása." },
+                    { id: 10, name: "Blogírás", category: "tech", min_price: 0, max_price: 30,description: "Írás és tartalomkészítés az interneten." }
                 ]);*/
             setLoading(false);
             setFilteredHobbies(hobbies);
@@ -49,7 +49,7 @@ function Hobbies(){
             filtered = filtered.filter(hobby => hobby.category.toLowerCase() === categoryFilter);
         }
 
-        filtered = filtered.filter(hobby => hobby.price >= priceFilterMin && hobby.price <= priceFilterMax);
+        filtered = filtered.filter(hobby => hobby.min_price >= priceFilterMin && hobby.max_price <= priceFilterMax);
 
         switch(sortBy){
             case "nameasc":
@@ -59,10 +59,10 @@ function Hobbies(){
                 filtered.sort((a, b) => b.name.localeCompare(a.name));
                 break;
             case "cheap":
-                filtered.sort((a, b) => a.price - b.price);
+                filtered.sort((a, b) => a.min_price - b.min_price);
                 break;
             case "expensive":
-                filtered.sort((a, b) => b.price - a.price);
+                filtered.sort((a, b) => b.max_price - a.max_price);
                 break;
             default: break;
         }

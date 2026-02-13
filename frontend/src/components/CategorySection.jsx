@@ -46,35 +46,30 @@ function CategorySection() {
   };
 
   return (
-    <div>
-      <h2>Manage Categories</h2>
+      <div className="max-w-md mx-auto">
+        <div className="card bg-base-200 p-6 shadow-lg mb-8">
+          <form onSubmit={handleAdd} className="flex gap-2">
+            <input
+              type="text" className="input input-bordered flex-1"
+              placeholder="New category..."
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+            />
+            <button className="btn btn-primary">Add</button>
+          </form>
+        </div>
 
-      <form onSubmit={handleAdd} >
-        <input
-          type="text"
-          placeholder="New category name"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-        />
-        <button type="submit">Add</button>
-      </form>
-
-      {loading ? <p>Loading...</p> : (
-        <ul>
+        <ul className="menu bg-base-100 w-full rounded-box border border-base-300 shadow-md">
+          <li className="menu-title text-lg">Existing Categories</li>
           {categories.map((cat) => (
-            <li key={cat.id}>
-              {cat.name}
-              <button
-                onClick={() => handleDelete(cat.id)}
-              >
-                Delete
-              </button>
+            <li key={cat.id} className="flex-row justify-between items-center p-2 border-b border-base-200 last:border-0">
+              <span className="flex-1 font-semibold">{cat.name}</span>
+              <button className="btn btn-xs btn-error btn-outline" onClick={() => handleDelete(cat.id)}>Delete</button>
             </li>
           ))}
         </ul>
-      )}
-    </div>
-  );
+      </div>
+    );
 }
 
 export default CategorySection;
