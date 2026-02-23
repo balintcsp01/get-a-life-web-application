@@ -7,12 +7,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class FileSystemStorageService implements FileStorageService {
 
-    private static final String DEFAULT_EXTENSION = "png";
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("png", "jpg", "jpeg");
     private final Path rootLocation;
 
     public FileSystemStorageService() {
@@ -66,19 +67,32 @@ public class FileSystemStorageService implements FileStorageService {
         if (file == null || file.isEmpty()) {
             throw new StorageException("Cannot store empty file.");
         }
+
+        String contentType = file.getContentType();
+        if (contentType == null ||
+                (!contentType.equals("image/png") &&
+                        !contentType.equals("image/jpeg"))) {
+            throw new StorageException("Only PNG and JPG images are allowed.");
+        }
     }
 
     private String resolveExtension(String originalFilename) {
         if (originalFilename == null) {
-            return DEFAULT_EXTENSION;
+            throw new StorageException("File must have a valid name.");
         }
 
         int dotIndex = originalFilename.lastIndexOf('.');
         if (dotIndex < 0 || dotIndex == originalFilename.length() - 1) {
-            return DEFAULT_EXTENSION;
+            throw new StorageException("File must have an extension.");
         }
 
-        return originalFilename.substring(dotIndex + 1).toLowerCase();
+        String extension = originalFilename.substring(dotIndex + 1).toLowerCase();
+
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            throw new StorageException("Only PNG and JPG images are allowed.");
+        }
+
+        return extension;
     }
 
     private void ensureWithinStorage(Path path) {
