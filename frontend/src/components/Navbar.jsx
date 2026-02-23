@@ -13,7 +13,6 @@ export default function Navbar() {
 
                 <div className="hidden md:flex gap-4">
                     <Link to="/" className="btn btn-ghost btn-sm rounded-btn">Home</Link>
-                    <Link to="/ping" className="btn btn-ghost btn-sm rounded-btn">Backend test</Link>
                     <Link to="/admin" className="btn btn-ghost btn-sm rounded-btn">Admin</Link>
                     <Link to="/hobbies" className="btn btn-ghost btn-sm rounded-btn">Hobbies</Link>
                 </div>
@@ -34,7 +33,6 @@ export default function Navbar() {
             {isMenuOpen && (
                 <div className="bg-base-100 shadow-md flex flex-col md:hidden">
                     <Link to="/" className="btn btn-ghost w-full rounded-none text-left">Home</Link>
-                    <Link to="/ping" className="btn btn-ghost w-full rounded-none text-left">Backend</Link>
                     <Link to="/admin" className="btn btn-ghost w-full rounded-none text-left">Admin</Link>
                     <Link to="/hobbies" className="btn btn-ghost w-full rounded-none text-left">Hobbies</Link>
                 </div>
