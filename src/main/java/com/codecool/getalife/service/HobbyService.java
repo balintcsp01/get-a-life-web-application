@@ -76,6 +76,7 @@ public class HobbyService {
     private HobbyResponse toResponse(Hobby hobby) {
 
         return new HobbyResponse(
+                hobby.getId(),
                 hobby.getName(),
                 "/images/" + hobby.getImagePath(),
                 hobby.getDescription(),
