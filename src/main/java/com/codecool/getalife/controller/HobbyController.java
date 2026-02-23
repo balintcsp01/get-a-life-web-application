@@ -1,6 +1,7 @@
 package com.codecool.getalife.controller;
 
 import com.codecool.getalife.model.dto.hobby.HobbyCreateRequest;
+import com.codecool.getalife.model.dto.hobby.HobbyPatchRequest;
 import com.codecool.getalife.model.dto.hobby.HobbyResponse;
 import com.codecool.getalife.service.HobbyService;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,20 @@ public class HobbyController {
             @RequestPart("hobby") HobbyCreateRequest req,
             @RequestPart("image") MultipartFile img) {
         return ResponseEntity.status(HttpStatus.CREATED).body(hobbyService.create(req, img));
+    }
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<HobbyResponse> patch(
+            @PathVariable Long id,
+            @RequestPart("hobby") HobbyPatchRequest req,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+        return ResponseEntity.ok(hobbyService.patch(id, req, image));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        hobbyService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -8,6 +8,7 @@ import com.codecool.getalife.model.Category;
 import com.codecool.getalife.model.Hobby;
 import com.codecool.getalife.model.dto.category.CategoryNameResponse;
 import com.codecool.getalife.model.dto.hobby.HobbyCreateRequest;
+import com.codecool.getalife.model.dto.hobby.HobbyPatchRequest;
 import com.codecool.getalife.model.dto.hobby.HobbyResponse;
 import com.codecool.getalife.repository.CategoryRepository;
 import com.codecool.getalife.repository.HobbyRepository;
@@ -73,9 +74,70 @@ public class HobbyService {
         return toResponse(savedHobby);
     }
 
+    public HobbyResponse patch(Long id, HobbyPatchRequest req, MultipartFile image) {
+
+        Hobby hobby = hobbyRepository.findById(id)
+                .orElseThrow(() -> new HobbyNotFoundException(id.toString()));
+
+        if (req.name() != null) {
+            if (!hobby.getName().equalsIgnoreCase(req.name())
+                    && hobbyRepository.existsByNameIgnoreCase(req.name())) {
+                throw new HobbyDuplicateException(req.name());
+            }
+            hobby.setName(req.name());
+        }
+
+        if (req.description() != null) {
+            hobby.setDescription(req.description());
+        }
+
+        if (req.minPrice() != null) {
+            hobby.setMin_price(req.minPrice());
+        }
+
+        if (req.maxPrice() != null) {
+            hobby.setMax_price(req.maxPrice());
+        }
+
+        if (req.categoryIds() != null) {
+            Set<Category> categories = req.categoryIds().stream()
+                    .map(catId -> categoryRepository.findById(catId)
+                            .orElseThrow(() -> new CategoryNotFoundException(catId.toString())))
+                    .collect(Collectors.toSet());
+
+            hobby.setCategories(categories);
+        }
+
+        if (image != null && !image.isEmpty()) {
+            if (hobby.getImagePath() != null) {
+                fileStorageService.delete(hobby.getImagePath());
+            }
+
+            String newImagePath = fileStorageService.store(image);
+            hobby.setImagePath(newImagePath);
+        }
+
+        Hobby updated = hobbyRepository.save(hobby);
+        return toResponse(updated);
+    }
+
+    public void delete(Long id) {
+        var hobby = hobbyRepository.findById(id).orElseThrow(
+                () -> new HobbyNotFoundException(id.toString())
+        );
+
+        if (hobby.getImagePath() != null) {
+            fileStorageService.delete(hobby.getImagePath());
+        }
+
+        hobbyRepository.delete(hobby);
+
+    }
+
     private HobbyResponse toResponse(Hobby hobby) {
 
         return new HobbyResponse(
+                hobby.getId(),
                 hobby.getName(),
                 "/images/" + hobby.getImagePath(),
                 hobby.getDescription(),
@@ -87,4 +149,6 @@ public class HobbyService {
                 hobby.getMax_price()
         );
     }
+
+
 }
