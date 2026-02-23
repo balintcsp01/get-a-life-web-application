@@ -53,7 +53,7 @@ public class UserService {
     }
 
     public UserResponse get(Long id) {
-        User user = userRepository.findUserById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id.toString())
         );
 

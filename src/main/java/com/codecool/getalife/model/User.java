@@ -2,10 +2,7 @@ package com.codecool.getalife.model;
 
 import com.codecool.getalife.common.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +10,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Getter @NoArgsConstructor @AllArgsConstructor
+@Setter
 @Builder
 public class User extends BaseEntity {
 
@@ -25,6 +23,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password_hash;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<String> roles = new HashSet<>();
+
+    private boolean enabled = true;
     @ManyToMany
     @JoinTable(
             name = "user_wishlist",
