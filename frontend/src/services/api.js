@@ -73,8 +73,61 @@ export const hobbyApi = {
   delete: (id) => fetch(`${API_BASE}/hobbies/${id}`, { method: 'DELETE' })
 };
 
-
 export const suggestionApi = {
   getAll: () => fetch(`${API_BASE}/suggestions`).then(res => res.json()),
   delete: (id) => fetch(`${API_BASE}/suggestions/${id}`, { method: 'DELETE' })
+};
+
+export const authApi = {
+  register: async (username, email, password) => {
+    const response = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Registration failed');
+    }
+
+    return response.json();
+  },
+
+  login: async (email, password) => {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Login failed');
+    }
+
+    return response.json();
+  },
+
+  logout: async () => {
+    const response = await fetch(`${API_BASE}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    return response.ok;
+  },
+
+  refreshToken: async () => {
+    const response = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Token refresh failed');
+    }
+
+    return response.json();
+  }
 };

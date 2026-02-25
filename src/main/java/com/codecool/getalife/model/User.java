@@ -30,7 +30,6 @@ public class User extends BaseEntity {
     @Column(name = "role")
     private Set<String> roles = new HashSet<>();
 
-    private boolean enabled = true;
     @ManyToMany
     @JoinTable(
             name = "user_wishlist",

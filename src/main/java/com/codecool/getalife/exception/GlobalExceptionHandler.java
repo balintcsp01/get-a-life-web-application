@@ -93,7 +93,7 @@ public class GlobalExceptionHandler {
     ) {
         return buildError(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Unexpected error occured",
+                "Unexpected error occurred",
                 request
         );
     }

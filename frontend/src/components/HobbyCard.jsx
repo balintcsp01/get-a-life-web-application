@@ -1,7 +1,7 @@
 import {Link} from "react-router-dom";
 
 function HobbyCard({hobby}){
-    const maxDescriptionLength =120;
+    const maxDescriptionLength = 120;
     const description =
         typeof hobby?.description === "string"
             ? hobby.description : "";
@@ -10,32 +10,56 @@ function HobbyCard({hobby}){
         description.length > maxDescriptionLength ? `${description.slice(0, maxDescriptionLength)}...`
             : description;
 
-    const priceRange = hobby?.min_price != null && hobby?.max_price != null ? `${hobby.min_price} - ${hobby.max_price}` : null;
+    const priceRange = hobby?.min_price != null && hobby?.max_price != null
+        ? `$${hobby.min_price} - $${hobby.max_price}`
+        : null;
 
     const hasImage =
         hobby?.imageUrl &&
         hobby.imageUrl !== "/images/null" &&
         !hobby.imageUrl.endsWith("/images/null");
 
-    return (
-        <Link to={`/hobbies/${hobby.id}`}>
-            <div className="card w-64 bg-base-100 shadow-md">
-                <figure className="h-40 bg-base-200 shrink-0">
-                    {hasImage ? (
-                        <img src={hobby.imageUrl}
-                             alt={hobby.name}
-                             className="h-40 w-full object-cover"
-                        />
-                    ) : (
-                        <img src="https://placehold.co/256x160?text=No+Image"
-                             alt="No image"
-                             className="h-40 w-full object-cover"
-                        />
-                    )}
-                </figure>
+    const categoryLabel = Array.isArray(hobby?.categories) && hobby.categories.length > 0
+        ? hobby.categories[0]?.name ?? String(hobby.categories[0])
+        : "Category";
 
-                <div className="card-body p-4 gap-2 flex flex-col flex-1">
-                    <h3 className="card-title text-base">{hobby.name}</h3>
+    const difficultyLabel = typeof hobby?.difficulty === "string" && hobby.difficulty.trim()
+        ? hobby.difficulty
+        : "Beginner";
+
+    return (
+        <Link to={`/hobbies/${hobby.id}`} className="group">
+            <div className="card w-full overflow-hidden rounded-2xl bg-base-100 shadow-md transition hover:shadow-lg">
+                <div className="relative">
+                    <figure className="h-44 bg-base-200">
+                        {hasImage ? (
+                            <img src={hobby.imageUrl}
+                                 alt={hobby.name}
+                                 className="h-44 w-full object-cover"
+                            />
+                        ) : (
+                            <img src="https://placehold.co/288x176?text=No+Image"
+                                 alt="No image"
+                                 className="h-44 w-full object-cover"
+                            />
+                        )}
+                    </figure>
+                    <span className="absolute left-3 top-3 rounded-full bg-base-100 px-3 py-1 text-xs font-semibold shadow">
+                        {categoryLabel}
+                    </span>
+                    <button
+                        type="button"
+                        className="btn btn-circle btn-xs absolute right-3 top-3 bg-base-100 text-base-content shadow"
+                        title="Favourites coming soon"
+                        onClick={(event) => event.preventDefault()}
+                        aria-label="Add to favourites"
+                    >
+                        ❤
+                    </button>
+                </div>
+
+                <div className="card-body gap-3 p-5">
+                    <h3 className="text-lg font-semibold">{hobby.name}</h3>
 
                     {truncatedDescription && (
                         <p className="text-sm text-base-content/70">
@@ -43,19 +67,14 @@ function HobbyCard({hobby}){
                         </p>
                     )}
 
-                    {Array.isArray(hobby?.categories) && hobby.categories.length >0 && (
-                        <div className="flex flex-wrap gap-1">
-                            {hobby.categories.map((cat) => (
-                                <span key={cat.id ?? cat.name} className="badge badge-ghost">
-                                        {cat.name ?? String(cat)}
-                                 </span>
-                            ))}
-                        </div>
-                    )}
-
-                    {priceRange && (
-                        <div className="text-sm font-medium mt-auto">{priceRange}</div>
-                    )}
+                    <div className="mt-1 flex items-center justify-between">
+                        <span className="badge badge-success badge-sm font-medium">
+                            {difficultyLabel}
+                        </span>
+                        {priceRange && (
+                            <span className="text-sm font-semibold text-primary">{priceRange}</span>
+                        )}
+                    </div>
                 </div>
             </div>
         </Link>

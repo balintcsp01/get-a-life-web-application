@@ -6,6 +6,7 @@ import com.codecool.getalife.model.dto.auth.LoginRequest;
 import com.codecool.getalife.model.dto.auth.RegisterRequest;
 import com.codecool.getalife.repository.UserRepository;
 import com.codecool.getalife.security.JwtUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,10 +14,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -37,38 +41,49 @@ public class AuthService {
                 .email(request.email())
                 .password_hash(passwordEncoder.encode(request.password()))
                 .roles(Set.of("USER"))
-                .enabled(true)
                 .build();
 
         userRepository.save(user);
+        userRepository.flush();
 
         return login(new LoginRequest(request.email(), request.password()));
     }
 
     public AuthResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                )
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password()
+                    )
+            );
 
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            User user = userRepository.findByEmail(request.email())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
+            String accessToken = jwtUtil.generateAccessToken(authentication);
+            String refreshToken = jwtUtil.generateRefreshToken(authentication);
 
-        String accessToken = jwtUtil.generateAccessToken(authentication);
-        String refreshToken = jwtUtil.generateRefreshToken(authentication);
-
-        return new AuthResponse(
-                accessToken,
-                refreshToken,
-                user.getEmail(),
-                user.getName(),
-                user.getRoles().stream()
+            // Handle null or empty roles - default to USER role
+            List<String> roles = new ArrayList<>();
+            if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                roles = user.getRoles().stream()
                         .map(role -> "ROLE_" + role)
-                        .toList()
-        );
+                        .toList();
+            } else {
+                roles = List.of("ROLE_USER");
+            }
+
+            return new AuthResponse(
+                    accessToken,
+                    refreshToken,
+                    user.getEmail(),
+                    user.getName(),
+                    roles
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Login failed: " + e.getMessage());
+        }
     }
 
     public AuthResponse refreshToken(String refreshToken) {
@@ -80,19 +95,28 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 user.getEmail(), null, user.getAuthorities());
 
         String newAccessToken = jwtUtil.generateAccessToken(authentication);
         String newRefreshToken = jwtUtil.generateRefreshToken(authentication);
 
+        // Handle null or empty roles - default to USER role
+        List<String> roles = new ArrayList<>();
+        if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+            roles = user.getRoles().stream()
+                    .map(role -> "ROLE_" + role)
+                    .toList();
+        } else {
+            roles = List.of("ROLE_USER");
+        }
+
         return new AuthResponse(
                 newAccessToken,
                 newRefreshToken,
                 user.getEmail(),
                 user.getName(),
-                user.getRoles().stream().map(role -> "ROLE_" + role).toList()
+                roles
         );
     }
 }
