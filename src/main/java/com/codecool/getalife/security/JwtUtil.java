@@ -51,7 +51,7 @@ public class JwtUtil {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-                .signWith(refreshTokenKey, SignatureAlgorithm.HS256) // Fontos: a REFRESH kulccsal!
+                .signWith(refreshTokenKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
