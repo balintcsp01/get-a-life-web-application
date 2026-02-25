@@ -3,8 +3,10 @@ package com.codecool.getalife.model;
 import com.codecool.getalife.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,4 +38,9 @@ public class User extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "hobby_id")
     )
     private Set<Hobby> hobbies = new HashSet<>();
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .toList();
+    }
 }
