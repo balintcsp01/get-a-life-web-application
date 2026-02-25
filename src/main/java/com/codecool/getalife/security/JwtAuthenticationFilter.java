@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            logger.error("Nem sikerült beállítani a felhasználói hitelesítést: " + e.getMessage());
+            logger.error(e.getMessage());
         }
 
         filterChain.doFilter(request, response);
