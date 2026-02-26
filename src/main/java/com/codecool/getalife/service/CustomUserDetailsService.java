@@ -28,7 +28,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .authorities(user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toList()))
-                .disabled(!user.isEnabled())
                 .build();
     }
 }
