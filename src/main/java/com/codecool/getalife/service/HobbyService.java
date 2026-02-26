@@ -68,6 +68,7 @@ public class HobbyService {
                 .min_price(req.minPrice())
                 .max_price(req.maxPrice())
                 .categories(categories)
+                .difficulty(req.difficulty())
                 .build();
 
         Hobby savedHobby = hobbyRepository.save(hobby);
@@ -146,7 +147,8 @@ public class HobbyService {
                         .map(category -> new CategoryNameResponse(category.getId(), category.getName()))
                         .collect(Collectors.toSet()),
                 hobby.getMin_price(),
-                hobby.getMax_price()
+                hobby.getMax_price(),
+                hobby.getDifficulty()
         );
     }
 

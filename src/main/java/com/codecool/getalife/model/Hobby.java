@@ -29,6 +29,9 @@ public class Hobby extends BaseEntity {
     @Column(nullable = false)
     private Integer max_price;
 
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'Beginner'")
+    private String difficulty;
+
     @ManyToMany
     @JoinTable(
             name = "hobby_categories",
