@@ -1,19 +1,43 @@
 const API_BASE = "http://localhost:8080/api";
+const token = localStorage.getItem("accessToken");
 
 export const categoryApi = {
-  getAll: () => fetch(`${API_BASE}/categories`).then(res => res.json()),
+  getAll: () => fetch(`${API_BASE}/categories`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(res => res.json()),
+
   create: (name) => fetch(`${API_BASE}/categories`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({ name })
   }).then(res => res.json()),
-  delete: (id) => fetch(`${API_BASE}/categories/${id}`, { method: 'DELETE' })
+
+  delete: (id) => fetch(`${API_BASE}/categories/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+  })
 };
 
 export const hobbyApi = {
   getAll: () => fetch(`${API_BASE}/hobbies`).then(res => res.json()),
   getById: async (id) => {
-    const response = await fetch(`${API_BASE}/hobbies/${id}`);
+    const response = await fetch(`${API_BASE}/hobbies/${id}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     if (!response.ok) throw new Error("Hobby not found");
     return response.json();
   },
@@ -21,7 +45,6 @@ export const hobbyApi = {
   create: (data, imageFile) => {
     const formData = new FormData();
 
-    // Add hobby data as JSON blob
     const hobbyBlob = new Blob([JSON.stringify({
       name: data.name,
       description: data.description,
@@ -35,6 +58,9 @@ export const hobbyApi = {
 
     return fetch(`${API_BASE}/hobbies`, {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
       body: formData
     }).then(res => {
       if (!res.ok) throw new Error('Failed to create hobby');
@@ -45,7 +71,6 @@ export const hobbyApi = {
   update: (id, data, imageFile) => {
     const formData = new FormData();
 
-    // Add hobby data as JSON blob
     const hobbyBlob = new Blob([JSON.stringify({
       name: data.name,
       description: data.description,
@@ -56,13 +81,15 @@ export const hobbyApi = {
 
     formData.append('hobby', hobbyBlob);
 
-    // Only append image if a new one is selected
     if (imageFile) {
       formData.append('image', imageFile);
     }
 
     return fetch(`${API_BASE}/hobbies/${id}`, {
       method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
       body: formData
     }).then(res => {
       if (!res.ok) throw new Error('Failed to update hobby');
@@ -70,7 +97,13 @@ export const hobbyApi = {
     });
   },
 
-  delete: (id) => fetch(`${API_BASE}/hobbies/${id}`, { method: 'DELETE' })
+  delete: (id) => fetch(`${API_BASE}/hobbies/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
 };
 
 export const suggestionApi = {
