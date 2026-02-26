@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { categoryApi, hobbyApi } from '../services/api.js';
+import Badge from "daisyui/components/badge/index.js";
 
 function HobbySection() {
   const initialFormState = {
@@ -7,13 +8,17 @@ function HobbySection() {
     categoryIds: [],
     min_price: 0,
     max_price: 0,
-    description: ''
+    description: '',
+    difficulty: ''
   };
   const [categories, setCategories] = useState([]);
+  const [selectedDifficulty, setSelectedDifficulty] = useState("Beginner");
   const [hobbies, setHobbies] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
   const [selectedImage, setSelectedImage] = useState(null);
   const [editingId, setEditingId] = useState(null);
+
+  const difficulties = ["Beginner", "Intermediate", "Advanced"];
 
   useEffect(() => { loadAllData(); }, []);
 
@@ -89,6 +94,21 @@ function HobbySection() {
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
               </select>
+            </div>
+
+            <div className="flex gap-2">
+              {difficulties.map((level) => (
+                  <button
+                      key={level}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, difficulty: level })}
+                      className={`badge cursor-pointer ${
+                          formData.difficulty === level ? "badge-primary" : "badge-outline"
+                      }`}
+                  >
+                    {level}
+                  </button>
+              ))}
             </div>
 
             <div className="flex gap-2">

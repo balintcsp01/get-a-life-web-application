@@ -7,5 +7,6 @@ public record HobbyCreateRequest(
         String description,
         Set<Long> categoryIds,
         Integer minPrice,
-        Integer maxPrice
+        Integer maxPrice,
+        String difficulty
 ) {}

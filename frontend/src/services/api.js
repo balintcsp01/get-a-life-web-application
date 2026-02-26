@@ -50,7 +50,8 @@ export const hobbyApi = {
       description: data.description,
       categoryIds: data.categoryIds,
       minPrice: data.minPrice,
-      maxPrice: data.maxPrice
+      maxPrice: data.maxPrice,
+      difficulty: data.difficulty
     })], { type: 'application/json' });
 
     formData.append('hobby', hobbyBlob);
@@ -76,7 +77,8 @@ export const hobbyApi = {
       description: data.description,
       categoryIds: data.categoryIds,
       minPrice: data.minPrice,
-      maxPrice: data.maxPrice
+      maxPrice: data.maxPrice,
+      difficulty: data.difficulty
     })], { type: 'application/json' });
 
     formData.append('hobby', hobbyBlob);

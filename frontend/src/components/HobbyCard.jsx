@@ -23,6 +23,19 @@ function HobbyCard({hobby}){
         ? hobby.categories[0]?.name ?? String(hobby.categories[0])
         : "Category";
 
+    const getDifficultyColor = (difficultyLabel) => {
+        switch (difficultyLabel) {
+            case 'Beginner':
+                return 'bg-green-100 text-green-700';
+            case 'Intermediate':
+                return 'bg-yellow-100 text-yellow-700';
+            case 'Advanced':
+                return 'bg-red-100 text-red-700';
+            default:
+                return 'bg-gray-100 text-gray-700';
+        }
+    }
+
     const difficultyLabel = typeof hobby?.difficulty === "string" && hobby.difficulty.trim()
         ? hobby.difficulty
         : "Beginner";
@@ -68,7 +81,7 @@ function HobbyCard({hobby}){
                     )}
 
                     <div className="mt-1 flex items-center justify-between">
-                        <span className="badge badge-success badge-sm font-medium">
+                        <span className={`badge badge-sm font-medium ${getDifficultyColor(difficultyLabel)}`}>
                             {difficultyLabel}
                         </span>
                         {priceRange && (
