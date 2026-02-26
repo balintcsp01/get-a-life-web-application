@@ -33,4 +33,10 @@ public class CategoryController {
     public ResponseEntity<CategoryNameResponse> create(@RequestBody CategoryCreateRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(req));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

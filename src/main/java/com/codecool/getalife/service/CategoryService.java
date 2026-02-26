@@ -54,4 +54,11 @@ public class CategoryService {
     private CategoryNameResponse toResponse(Category category) {
         return new CategoryNameResponse(category.getId(), category.getName());
     }
+
+    public void delete(Long id) {
+        var category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException(id.toString()));
+
+        categoryRepository.delete(category);
+    }
 }
