@@ -1,10 +1,12 @@
 package com.codecool.getalife.controller;
 
-import com.codecool.getalife.model.dto.auth.*;
+import com.codecool.getalife.model.dto.auth.AuthResponse;
+import com.codecool.getalife.model.dto.auth.LoginRequest;
+import com.codecool.getalife.model.dto.auth.RegisterRequest;
 import com.codecool.getalife.service.AuthService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,10 @@ public class AuthController {
     private final AuthService authService;
 
     @Value("${jwt.refresh-token-expiration:604800000}")
-    private long refreshTokenExpiration;
+    private long refreshTokenExpirationMs;
+
+    @Value("${app.secure-cookies:false}")
+    private boolean secureCookies;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
@@ -28,9 +33,7 @@ public class AuthController {
             HttpServletResponse response) {
 
         AuthResponse authResponse = authService.register(request);
-
         setRefreshTokenCookie(response, authResponse.refreshToken());
-
         return ResponseEntity.ok(authResponse);
     }
 
@@ -40,9 +43,7 @@ public class AuthController {
             HttpServletResponse response) {
 
         AuthResponse authResponse = authService.login(request);
-
         setRefreshTokenCookie(response, authResponse.refreshToken());
-
         return ResponseEntity.ok(authResponse);
     }
 
@@ -52,19 +53,8 @@ public class AuthController {
             HttpServletResponse response) {
 
         String refreshToken = getRefreshTokenFromCookie(request);
-
-        if (refreshToken == null) {
-            return ResponseEntity.status(401).build();
-        }
-
         AuthResponse authResponse = authService.refreshToken(refreshToken);
-
-        if (authResponse == null) {
-            return ResponseEntity.status(401).build();
-        }
-
         setRefreshTokenCookie(response, authResponse.refreshToken());
-
         return ResponseEntity.ok(authResponse);
     }
 
@@ -72,33 +62,29 @@ public class AuthController {
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("refreshToken", null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/api/auth");
+        cookie.setSecure(secureCookies);
+        cookie.setPath("/api/auth/refresh");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
-
         return ResponseEntity.ok().build();
     }
-
 
     private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/api/*");
-        cookie.setMaxAge((int) (refreshTokenExpiration / 1000));
+        cookie.setSecure(secureCookies);
+        cookie.setPath("/api/auth/refresh");
+        cookie.setMaxAge((int) (refreshTokenExpirationMs / 1000));
         response.addCookie(cookie);
     }
 
     private String getRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            return Arrays.stream(cookies)
-                    .filter(cookie -> "refreshToken".equals(cookie.getName()))
-                    .map(Cookie::getValue)
-                    .findFirst()
-                    .orElse(null);
-        }
-        return null;
+        if (cookies == null) return null;
+        return Arrays.stream(cookies)
+                .filter(c -> "refreshToken".equals(c.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 }
