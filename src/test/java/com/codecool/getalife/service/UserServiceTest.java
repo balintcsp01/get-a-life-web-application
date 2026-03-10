@@ -56,7 +56,7 @@ class UserServiceTest {
     void setUp() {
         hobby1 = TestEntityFactory.withId(Hobby.builder().name("Chess").description("Board game").min_price(0).max_price(50).difficulty("Beginner").build(), 1L);
         hobby2 = TestEntityFactory.withId(Hobby.builder().name("Hiking").description("Outdoor activity").min_price(0).max_price(100).difficulty("Intermediate").build(), 2L);
-        savedUser = TestEntityFactory.withId(User.builder().name("Alice").email("alice@example.com").password_hash("hashed").hobbies(Set.of(hobby1)).build(), 10L);
+        savedUser = TestEntityFactory.withId(User.builder().name("Luna").email("luna@meow.com").password_hash("hashed").hobbies(Set.of(hobby1)).build(), 10L);
     }
 
 
@@ -67,16 +67,16 @@ class UserServiceTest {
         @Test
         @DisplayName("returns UserResponse when request is valid")
         void create_validRequest_returnsUserResponse() {
-            UserCreateRequest request = new UserCreateRequest("Alice", "alice@example.com", "secret", Set.of(1L));
+            UserCreateRequest request = new UserCreateRequest("Luna", "luna@meow.com", "purr1234", Set.of(1L));
 
-            when(passwordEncoder.encode("secret")).thenReturn("hashed");
+            when(passwordEncoder.encode("purr1234")).thenReturn("hashed");
             when(hobbyRepository.findById(1L)).thenReturn(Optional.of(hobby1));
             when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
             UserResponse response = userService.create(request);
 
-            assertThat(response.name()).isEqualTo("Alice");
-            assertThat(response.email()).isEqualTo("alice@example.com");
+            assertThat(response.name()).isEqualTo("Luna");
+            assertThat(response.email()).isEqualTo("luna@meow.com");
             assertThat(response.id()).isEqualTo(10L);
             assertThat(response.hobbyIds()).containsExactly(new HobbyIdResponse(1L));
         }
@@ -84,7 +84,7 @@ class UserServiceTest {
         @Test
         @DisplayName("hashes password before saving")
         void create_encodesPassword() {
-            UserCreateRequest request = new UserCreateRequest("Alice", "alice@example.com", "plaintext", Set.of());
+            UserCreateRequest request = new UserCreateRequest("Luna", "luna@meow.com", "plaintext", Set.of());
 
             when(passwordEncoder.encode("plaintext")).thenReturn("hashed");
             when(userRepository.save(any(User.class))).thenReturn(savedUser);
@@ -98,9 +98,9 @@ class UserServiceTest {
         @Test
         @DisplayName("resolves all hobby IDs and attaches them to user")
         void create_multipleHobbies_allAttached() {
-            UserCreateRequest request = new UserCreateRequest("Alice", "alice@example.com", "secret", Set.of(1L, 2L));
+            UserCreateRequest request = new UserCreateRequest("Luna", "luna@meow.com", "purr1234", Set.of(1L, 2L));
 
-            User userWithTwoHobbies = TestEntityFactory.withId(User.builder().name("Alice").email("alice@example.com").password_hash("hashed").hobbies(Set.of(hobby1, hobby2)).build(), 10L);
+            User userWithTwoHobbies = TestEntityFactory.withId(User.builder().name("Luna").email("luna@meow.com").password_hash("hashed").hobbies(Set.of(hobby1, hobby2)).build(), 10L);
 
             when(passwordEncoder.encode(anyString())).thenReturn("hashed");
             when(hobbyRepository.findById(1L)).thenReturn(Optional.of(hobby1));
@@ -119,7 +119,7 @@ class UserServiceTest {
         @Test
         @DisplayName("throws HobbyNotFoundException when a hobby ID does not exist")
         void create_unknownHobbyId_throwsHobbyNotFoundException() {
-            UserCreateRequest request = new UserCreateRequest("Alice", "alice@example.com", "secret", Set.of(99L));
+            UserCreateRequest request = new UserCreateRequest("Luna", "luna@meow.com", "purr1234", Set.of(99L));
 
             when(passwordEncoder.encode(anyString())).thenReturn("hashed");
             when(hobbyRepository.findById(99L)).thenReturn(Optional.empty());
@@ -131,7 +131,7 @@ class UserServiceTest {
         @Test
         @DisplayName("throws UserDuplicateException on DataIntegrityViolationException")
         void create_duplicateUser_throwsUserDuplicateException() {
-            UserCreateRequest request = new UserCreateRequest("Alice", "alice@example.com", "secret", Set.of());
+            UserCreateRequest request = new UserCreateRequest("Luna", "luna@meow.com", "purr1234", Set.of());
 
             when(passwordEncoder.encode(anyString())).thenReturn("hashed");
             when(userRepository.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
@@ -143,9 +143,9 @@ class UserServiceTest {
         @Test
         @DisplayName("works with empty hobby set")
         void create_noHobbies_savesUserWithEmptyHobbySet() {
-            UserCreateRequest request = new UserCreateRequest("Alice", "alice@example.com", "secret", Set.of());
+            UserCreateRequest request = new UserCreateRequest("Luna", "luna@meow.com", "purr1234", Set.of());
 
-            User userNoHobbies = TestEntityFactory.withId(User.builder().name("Alice").email("alice@example.com").password_hash("hashed").hobbies(Set.of()).build(), 10L);
+            User userNoHobbies = TestEntityFactory.withId(User.builder().name("Luna").email("luna@meow.com").password_hash("hashed").hobbies(Set.of()).build(), 10L);
 
             when(passwordEncoder.encode(anyString())).thenReturn("hashed");
             when(userRepository.save(any(User.class))).thenReturn(userNoHobbies);
@@ -169,8 +169,8 @@ class UserServiceTest {
             UserResponse response = userService.get(10L);
 
             assertThat(response.id()).isEqualTo(10L);
-            assertThat(response.name()).isEqualTo("Alice");
-            assertThat(response.email()).isEqualTo("alice@example.com");
+            assertThat(response.name()).isEqualTo("Luna");
+            assertThat(response.email()).isEqualTo("luna@meow.com");
         }
 
         @Test
@@ -200,16 +200,16 @@ class UserServiceTest {
         @Test
         @DisplayName("returns all users as UserResponse set")
         void getAll_multipleUsers_returnsAll() {
-            User alice = TestEntityFactory.withId(User.builder().name("Alice").email("alice@example.com").password_hash("h").hobbies(Set.of()).build(), 1L);
-            User bob = TestEntityFactory.withId(User.builder().name("Bob").email("bob@example.com").password_hash("h").hobbies(Set.of()).build(), 2L);
+            User luna = TestEntityFactory.withId(User.builder().name("Luna").email("luna@meow.com").password_hash("h").hobbies(Set.of()).build(), 1L);
+            User jeff = TestEntityFactory.withId(User.builder().name("Jeff").email("jeff@meow.com").password_hash("h").hobbies(Set.of()).build(), 2L);
 
-            when(userRepository.findAll()).thenReturn(List.of(alice, bob));
+            when(userRepository.findAll()).thenReturn(List.of(luna, jeff));
 
             Set<UserResponse> responses = userService.getAll();
 
             assertThat(responses).hasSize(2);
             assertThat(responses).extracting(UserResponse::name)
-                    .containsExactlyInAnyOrder("Alice", "Bob");
+                    .containsExactlyInAnyOrder("Luna", "Jeff");
         }
 
         @Test
@@ -225,9 +225,9 @@ class UserServiceTest {
         @Test
         @DisplayName("maps hobby IDs for each user")
         void getAll_usersWithHobbies_hobbyIdsMapped() {
-            User alice = TestEntityFactory.withId(User.builder().name("Alice").email("alice@example.com").password_hash("h").hobbies(Set.of(hobby1, hobby2)).build(), 1L);
+            User luna = TestEntityFactory.withId(User.builder().name("Luna").email("luna@meow.com").password_hash("h").hobbies(Set.of(hobby1, hobby2)).build(), 1L);
 
-            when(userRepository.findAll()).thenReturn(List.of(alice));
+            when(userRepository.findAll()).thenReturn(List.of(luna));
 
             Set<UserResponse> responses = userService.getAll();
 
