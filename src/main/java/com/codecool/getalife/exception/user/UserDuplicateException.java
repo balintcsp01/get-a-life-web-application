@@ -4,4 +4,8 @@ public class UserDuplicateException extends RuntimeException {
     public UserDuplicateException() {
         super("Email or username already in use");
     }
+
+    public UserDuplicateException(String message) {
+        super(message);
+    }
 }

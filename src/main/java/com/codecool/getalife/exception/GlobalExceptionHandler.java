@@ -1,5 +1,7 @@
 package com.codecool.getalife.exception;
 
+import com.codecool.getalife.exception.auth.InvalidCredentialsException;
+import com.codecool.getalife.exception.auth.InvalidTokenException;
 import com.codecool.getalife.exception.categories.CategoryDuplicateException;
 import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
@@ -76,7 +78,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDatabaseError(
-            DataIntegrityViolationException ex,
             HttpServletRequest request
     ) {
         return buildError(
@@ -86,9 +87,24 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(
+            InvalidCredentialsException ex,
+            HttpServletRequest request
+    ) {
+        return buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidToken(
+            InvalidTokenException ex,
+            HttpServletRequest request
+    ) {
+        return buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAll(
-            Exception ex,
             HttpServletRequest request
     ) {
         return buildError(
