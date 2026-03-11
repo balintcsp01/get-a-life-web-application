@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import HobbySection from '../components/HobbySection.jsx';
 import CategorySection from '../components/CategorySection.jsx';
 import SuggestionSection from '../components/SuggestionSection.jsx';

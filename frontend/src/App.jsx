@@ -7,7 +7,7 @@ import HomePage from "./pages/HomePage.jsx";
 import {AuthProvider} from "./contexts/AuthContext.jsx";
 import HobbyDetails from "./pages/HobbyDetails.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
-import AuthModal from "./components/AuthModal.jsx";
+import AuthModal from "./components/auth/AuthModal.jsx";
 
 function AppRoutes() {
   const location = useLocation();

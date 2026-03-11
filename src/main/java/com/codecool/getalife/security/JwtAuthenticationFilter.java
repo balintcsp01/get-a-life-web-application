@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (jwtUtil.validateToken(jwt, false) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                // The JWT subject is the user's email — see CustomUserDetailsService
                 String userEmail = jwtUtil.getUsernameFromToken(jwt, false);
                 String rolesString = jwtUtil.getRolesFromToken(jwt);
 
