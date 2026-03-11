@@ -7,7 +7,7 @@ function CategorySection() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadCategories();
+    void loadCategories();
   }, []);
 
   const loadCategories = async () => {
@@ -28,7 +28,7 @@ function CategorySection() {
     try {
       await categoryApi.create(newCategory);
       setNewCategory('');
-      loadCategories();
+      await loadCategories();
     } catch (err) {
       alert("Error: Category might already exist.");
     }
@@ -38,7 +38,7 @@ function CategorySection() {
     if (window.confirm("Are you sure?")) {
       try {
         await categoryApi.delete(id);
-        loadCategories();
+        await loadCategories();
       } catch (err) {
         alert("Could not delete category.");
       }
