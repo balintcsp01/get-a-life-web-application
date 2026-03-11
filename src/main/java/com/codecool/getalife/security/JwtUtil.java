@@ -58,7 +58,7 @@ public class JwtUtil {
 
     public String getEmailFromToken(String token, boolean isRefreshToken) {
         SecretKey key = isRefreshToken ? refreshTokenKey : accessTokenKey;
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
@@ -69,7 +69,7 @@ public class JwtUtil {
     public boolean validateToken(String token, boolean isRefreshToken) {
         try {
             SecretKey key = isRefreshToken ? refreshTokenKey : accessTokenKey;
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -78,7 +78,7 @@ public class JwtUtil {
 
     public String getUsernameFromToken(String token, boolean isRefreshToken) {
         SecretKey key = isRefreshToken ? refreshTokenKey : accessTokenKey;
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
@@ -87,7 +87,7 @@ public class JwtUtil {
     }
 
     public String getRolesFromToken(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(accessTokenKey)
                 .build()
                 .parseClaimsJws(token)
