@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,8 +25,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
+            HttpServletResponse response,
+            FilterChain filterChain
     ) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
@@ -42,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (jwtUtil.validateToken(jwt, false) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // The JWT subject is the user's email — see CustomUserDetailsService
-                String userEmail = jwtUtil.getUsernameFromToken(jwt, false);
+                String userEmail = jwtUtil.getEmailFromToken(jwt, false);
                 String rolesString = jwtUtil.getRolesFromToken(jwt);
 
                 List<SimpleGrantedAuthority> authorities = Stream

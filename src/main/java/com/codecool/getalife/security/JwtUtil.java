@@ -89,15 +89,15 @@ public class JwtUtil {
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
     public String getRolesFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(accessTokenKey)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)
+                .getBody()
+                .get("roles", String.class);
     }
 }
