@@ -75,7 +75,7 @@ public class AuthService {
             throw new InvalidTokenException();
         }
 
-        String email = jwtUtil.getUsernameFromToken(refreshToken, true);
+        String email = jwtUtil.getEmailFromToken(refreshToken, true);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
