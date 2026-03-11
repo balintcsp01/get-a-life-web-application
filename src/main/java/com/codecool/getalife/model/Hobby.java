@@ -12,12 +12,7 @@ import java.util.Set;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class Hobby extends BaseEntity {
-
-    @EqualsAndHashCode.Include
-    @Override
-    public Long getId() { return super.getId(); }
 
     @Column(nullable = false, length = 32, unique = true)
     private String name;
