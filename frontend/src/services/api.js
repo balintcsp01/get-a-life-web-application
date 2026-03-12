@@ -1,4 +1,4 @@
-const API_BASE = "/api";
+const API_BASE = "http://localhost:8081/api";
 
 const getToken = () => localStorage.getItem("accessToken");
 
@@ -57,39 +57,12 @@ const handleResponse = async (res) => {
     const text = await res.text();
     let message;
     try {
-      message = JSON.parse(text).message;
+      const json = JSON.parse(text);
+      message = json.message;
     } catch {}
     throw new Error(message || text || `Request failed with status ${res.status}`);
   }
   return res.json();
-};
-
-export const authApi = {
-  register: (username, email, password) =>
-    fetch(`${API_BASE}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
-      credentials: "include",
-    }).then(handleResponse),
-
-  login: (email, password) =>
-    fetch(`${API_BASE}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-      credentials: "include",
-    }).then(handleResponse),
-
-  me: () =>
-    fetchWithAuth(`${API_BASE}/auth/me`, { headers: authHeaders() })
-      .then(handleResponse),
-
-  logout: () =>
-    fetch(`${API_BASE}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    }).then((res) => res.ok),
 };
 
 export const categoryApi = {
@@ -111,8 +84,7 @@ export const categoryApi = {
 };
 
 export const hobbyApi = {
-  getAll: () =>
-    fetch(`${API_BASE}/hobbies`).then(handleResponse),
+  getAll: () => fetch(`${API_BASE}/hobbies`).then(handleResponse),
 
   getById: (id) =>
     fetchWithAuth(`${API_BASE}/hobbies/${id}`, { headers: authHeaders() }).then(handleResponse),
@@ -121,6 +93,7 @@ export const hobbyApi = {
     const formData = new FormData();
     formData.append("hobby", new Blob([JSON.stringify(data)], { type: "application/json" }));
     formData.append("image", imageFile);
+
     return fetchWithAuth(`${API_BASE}/hobbies`, {
       method: "POST",
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -132,6 +105,7 @@ export const hobbyApi = {
     const formData = new FormData();
     formData.append("hobby", new Blob([JSON.stringify(data)], { type: "application/json" }));
     if (imageFile) formData.append("image", imageFile);
+
     return fetchWithAuth(`${API_BASE}/hobbies/${id}`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -166,4 +140,28 @@ export const wishlistApi = {
       method: "DELETE",
       headers: authHeaders(),
     }).then(res => { if (!res.ok) throw new Error("Failed to remove from wishlist"); }),
+};
+
+export const authApi = {
+  register: (username, email, password) =>
+    fetch(`${API_BASE}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+      credentials: "include",
+    }).then(handleResponse),
+
+  login: (email, password) =>
+    fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
+    }).then(handleResponse),
+
+  logout: () =>
+    fetch(`${API_BASE}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    }).then((res) => res.ok),
 };
