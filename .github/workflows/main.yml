@@ -20,3 +20,6 @@ jobs:
 
       - name: Build Containers
         run: docker compose up --build
+
+      - name: Deployment finished
+        run: echo "✅ Docker Compose build finished successfully!"
