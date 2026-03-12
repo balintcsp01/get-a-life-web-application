@@ -31,6 +31,8 @@ services:
     restart: no
     ports:
       - "5173:5173"
+    environment:
+      VITE_BACKEND_URL: http://backend:8080
     depends_on:
       - backend
 

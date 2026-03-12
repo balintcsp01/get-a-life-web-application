@@ -14,52 +14,48 @@ import java.util.UUID;
 public class FileSystemStorageService implements FileStorageService {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("png", "jpg", "jpeg");
-    private final Path rootLocation;
-
-    public FileSystemStorageService() {
-        this.rootLocation = Paths.get("uploads", "hobbies").toAbsolutePath().normalize();
-        init();
-    }
-
-    private void init() {
-        try {
-            Files.createDirectories(rootLocation);
-        } catch (IOException e) {
-            throw new StorageException("Could not initialize storage directory.", e);
-        }
-    }
+    private static final Path UPLOADS_ROOT = Paths.get("uploads").toAbsolutePath().normalize();
 
     @Override
-    public String store(MultipartFile file) {
+    public String store(MultipartFile file, String subfolder) {
         validateFile(file);
+
+        Path location = UPLOADS_ROOT.resolve(subfolder).normalize();
+        ensureWithinStorage(location);
+
+        try {
+            Files.createDirectories(location);
+        } catch (IOException e) {
+            throw new StorageException("Could not create storage directory: " + subfolder, e);
+        }
 
         String extension = resolveExtension(file.getOriginalFilename());
         String filename = UUID.randomUUID() + "." + extension;
 
-        Path destination = rootLocation.resolve(filename).normalize();
+        Path destination = location.resolve(filename).normalize();
         ensureWithinStorage(destination);
 
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
-            return filename;
+            return subfolder + "/" + filename;
         } catch (IOException e) {
             throw new StorageException("Failed to store file.", e);
         }
     }
 
     @Override
-    public void delete(String filename) {
-        if (filename == null || filename.isBlank()) {
+    public void delete(String relativePath) {
+        if (relativePath == null || relativePath.isBlank()) {
             return;
         }
 
-        Path file = rootLocation.resolve(filename).normalize();
+        Path file = UPLOADS_ROOT.resolve(relativePath).normalize();
         ensureWithinStorage(file);
 
         try {
             Files.deleteIfExists(file);
         } catch (IOException e) {
-            throw new StorageException("Failed to delete file: " + filename, e);
+            throw new StorageException("Failed to delete file: " + relativePath, e);
         }
     }
 
@@ -96,7 +92,7 @@ public class FileSystemStorageService implements FileStorageService {
     }
 
     private void ensureWithinStorage(Path path) {
-        if (!path.startsWith(rootLocation)) {
+        if (!path.startsWith(UPLOADS_ROOT)) {
             throw new StorageException("Invalid file path.");
         }
     }

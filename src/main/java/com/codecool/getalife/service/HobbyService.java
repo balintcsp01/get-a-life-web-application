@@ -53,7 +53,7 @@ public class HobbyService {
             throw new HobbyMissingCategoryException();
         }
 
-        String imagePath = fileStorageService.store(img);
+        String imagePath = fileStorageService.store(img, "hobbies");
 
         Set<Category> categories = req.categoryIds()
                 .stream()
@@ -114,7 +114,7 @@ public class HobbyService {
                 fileStorageService.delete(hobby.getImagePath());
             }
 
-            String newImagePath = fileStorageService.store(image);
+            String newImagePath = fileStorageService.store(image, "hobbies");
             hobby.setImagePath(newImagePath);
         }
 

@@ -11,12 +11,12 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: process.env.VITE_BACKEND_URL || 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },
       '/images': {
-        target: 'http://localhost:8080',
+        target: process.env.VITE_BACKEND_URL || 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       }
