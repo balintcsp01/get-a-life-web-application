@@ -1,0 +1,27 @@
+name: Dev CI/CD
+
+on:
+  push:
+    branches: [development]
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Containers
+        run: docker compose build
+
+      - name: Deploy to dev server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script:
+            cd app
+            git pull
+            docker compose up -d --build
