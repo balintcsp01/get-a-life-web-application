@@ -30,22 +30,31 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const clearAuth = () => {
+    setUser(null);
+    setAccessToken(null);
+    clearSession();
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("accessToken");
 
     if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setAccessToken(storedToken);
+      authApi.me()
+        .then((data) => {
+          const userData = toUserData(data);
+          setUser(userData);
+          setAccessToken(storedToken);
+          localStorage.setItem("user", JSON.stringify(userData));
+        })
+        .catch(() => clearAuth())
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
 
-    setLoading(false);
-
-    const handleSessionExpired = () => {
-      setUser(null);
-      setAccessToken(null);
-    };
-
+    const handleSessionExpired = () => clearAuth();
     window.addEventListener("session-expired", handleSessionExpired);
     return () => window.removeEventListener("session-expired", handleSessionExpired);
   }, []);
@@ -81,9 +90,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      setUser(null);
-      setAccessToken(null);
-      clearSession();
+      clearAuth();
     }
   };
 
