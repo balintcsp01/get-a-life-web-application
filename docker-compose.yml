@@ -1,7 +1,7 @@
 services:
 
   db:
-    image: postgres:15
+    image: postgres:18
     restart: no
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -18,9 +18,11 @@ services:
       dockerfile: Dockerfile
     restart: no
     ports:
-      - "8081:8080"
+      - "8080:8080"
     env_file:
-      - .env
+      - .env.example
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
     depends_on:
       - db
 
