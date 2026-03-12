@@ -39,6 +39,7 @@ public class DataSeeder implements ApplicationRunner {
                 .filter(name -> !categoryRepository.existsCategoryByNameIgnoreCase(name))
                 .map(name -> Category.builder().name(name).build())
                 .forEach(categoryRepository::save);
+        categoryRepository.flush();
         log.info("Categories seeded.");
     }
 
