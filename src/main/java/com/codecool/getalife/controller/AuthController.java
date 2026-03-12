@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -56,6 +57,11 @@ public class AuthController {
         AuthResponse authResponse = authService.refreshToken(refreshToken);
         setRefreshTokenCookie(response, authResponse.refreshToken());
         return ResponseEntity.ok(authResponse);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AuthResponse> me(@AuthenticationPrincipal String email) {
+        return ResponseEntity.ok(authService.me(email));
     }
 
     @PostMapping("/logout")

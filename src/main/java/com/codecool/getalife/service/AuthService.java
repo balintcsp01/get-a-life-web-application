@@ -88,6 +88,12 @@ public class AuthService {
         return new AuthResponse(newAccessToken, newRefreshToken, user.getEmail(), user.getName(), buildRoles(user));
     }
 
+    public AuthResponse me(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+        return new AuthResponse(null, null, user.getEmail(), user.getName(), buildRoles(user));
+    }
+
     private List<String> buildRoles(User user) {
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             return List.of("ROLE_USER");
