@@ -99,14 +99,14 @@ class HobbyServiceTest {
         );
 
         when(hobbyRepository.existsByNameIgnoreCase("Football")).thenReturn(false);
-        when(fileStorageService.store(file)).thenReturn("img.png");
+        when(fileStorageService.store(file, "hobbies")).thenReturn("img.png");
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(hobbyRepository.save(any())).thenReturn(hobby);
 
         HobbyResponse response = hobbyService.create(req, file);
 
         assertEquals("Football", response.name());
-        verify(fileStorageService).store(file);
+        verify(fileStorageService).store(file, "hobbies");
     }
 
     @Test
@@ -164,7 +164,7 @@ class HobbyServiceTest {
         );
 
         when(hobbyRepository.existsByNameIgnoreCase("Football")).thenReturn(false);
-        when(fileStorageService.store(file)).thenReturn("img.png");
+        when(fileStorageService.store(file, "hobbies")).thenReturn("img.png");
         when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(CategoryNotFoundException.class,
@@ -189,14 +189,14 @@ class HobbyServiceTest {
         when(hobbyRepository.findById(1L)).thenReturn(Optional.of(hobby));
         when(hobbyRepository.existsByNameIgnoreCase("NewName")).thenReturn(false);
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
-        when(fileStorageService.store(file)).thenReturn("new.png");
+        when(fileStorageService.store(file, "hobbies")).thenReturn("new.png");
         when(hobbyRepository.save(any())).thenReturn(hobby);
 
         HobbyResponse result = hobbyService.patch(1L, req, file);
 
         assertEquals("NewName", result.name());
         verify(fileStorageService).delete("img.png");
-        verify(fileStorageService).store(file);
+        verify(fileStorageService).store(file, "hobbies");
     }
 
     @Test
