@@ -6,7 +6,6 @@ import com.codecool.getalife.model.Hobby;
 import com.codecool.getalife.model.dto.hobby.*;
 import com.codecool.getalife.repository.CategoryRepository;
 import com.codecool.getalife.repository.HobbyRepository;
-import com.codecool.getalife.service.HobbyService;
 import com.codecool.getalife.service.storage.FileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

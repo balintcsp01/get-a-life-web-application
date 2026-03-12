@@ -1,11 +1,10 @@
-package category;
+package com.codecool.getalife.service;
 
 import com.codecool.getalife.exception.categories.CategoryDuplicateException;
 import com.codecool.getalife.model.Category;
 import com.codecool.getalife.model.dto.category.CategoryCreateRequest;
 import com.codecool.getalife.model.dto.category.CategoryNameResponse;
 import com.codecool.getalife.repository.CategoryRepository;
-import com.codecool.getalife.service.CategoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
