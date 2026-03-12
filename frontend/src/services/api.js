@@ -7,8 +7,6 @@ const authHeaders = () => ({
   "Content-Type": "application/json",
 });
 
-// Tracks whether a refresh is already in progress, so concurrent
-// 401s don't each kick off their own refresh race.
 let refreshPromise = null;
 
 const tryRefresh = async () => {
