@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,14 +53,15 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public UserResponse get(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id.toString())
-        );
+                .orElseThrow(() -> new UserNotFoundException(id.toString()));
 
         return toResponse(user);
     }
 
+    @Transactional(readOnly = true)
     public Set<UserResponse> getAll() {
         return userRepository.findAll()
                 .stream()
