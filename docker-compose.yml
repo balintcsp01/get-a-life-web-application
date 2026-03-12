@@ -10,7 +10,7 @@ services:
     ports:
       - "5435:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
 
   backend:
     build:
@@ -20,7 +20,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - .env.example
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
     depends_on:
