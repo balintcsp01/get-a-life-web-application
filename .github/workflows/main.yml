@@ -14,14 +14,3 @@ jobs:
 
       - name: Build Containers
         run: docker compose up --build
-
-      - name: Deploy to dev server
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.DEV_SERVER_IP }}
-          username: ubuntu
-          key: ${{ secrets.DEV_SSH_KEY }}
-          script:
-            cd app
-            git pull
-            docker compose up -d --build
