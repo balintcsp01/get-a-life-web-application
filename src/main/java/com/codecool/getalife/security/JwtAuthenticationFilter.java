@@ -41,7 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (jwtUtil.validateToken(jwt, false) && SecurityContextHolder.getContext().getAuthentication() == null) {
-                String userEmail = jwtUtil.getUsernameFromToken(jwt, false);
+                // The JWT subject is the user's email — see CustomUserDetailsService
+                String userEmail = jwtUtil.getEmailFromToken(jwt, false);
                 String rolesString = jwtUtil.getRolesFromToken(jwt);
 
                 List<SimpleGrantedAuthority> authorities = Stream

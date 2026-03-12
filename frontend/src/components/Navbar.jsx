@@ -14,6 +14,17 @@ export default function Navbar() {
         setIsMenuOpen(false);
     };
 
+    const handleHashScroll = (id) => (e) => {
+        e.preventDefault();
+        const scroll = () => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+        if (location.pathname !== '/') {
+            navigate('/');
+            setTimeout(scroll, 100);
+        } else {
+            scroll();
+        }
+    };
+
     const openAuthModal = (mode) => {
         const path = mode === "register" ? "/register" : "/login";
         navigate(path, { state: { backgroundLocation: location } });
@@ -30,22 +41,22 @@ export default function Navbar() {
 
                     <div className="hidden md:flex items-center justify-center gap-6 text-sm font-medium">
                         <Link to="/hobbies" className="hover:text-primary">Hobbies</Link>
-                        <Link to="/#about" className="hover:text-primary">About</Link>
-                        <Link to="/#categories" className="hover:text-primary">Categories</Link>
+                        <a href="/#about" className="hover:text-primary" onClick={handleHashScroll('about')}>About</a>
+                        <a href="/#categories" className="hover:text-primary" onClick={handleHashScroll('categories')}>Categories</a>
                     </div>
 
                     <div className="flex items-center justify-end gap-2">
                         <div className="hidden md:block">
                             {isAuthenticated ? (
                                 <>
-                                    {isAdmin() && (
+                                    {isAdmin && (
                                         <Link to="/admin" className="btn btn-ghost btn-sm rounded-btn">Admin</Link>
                                     )}
                                     <div className="dropdown dropdown-end">
                                         <label tabIndex={0} className="btn btn-ghost btn-sm rounded-btn">
                                             👤 {user?.username}
                                         </label>
-                                        <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-2">
+                                        <ul tabIndex={0} className="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-52 mt-2">
                                             <li><a className="text-sm">{user?.email}</a></li>
                                             <li><hr className="my-1"/></li>
                                             <li><button onClick={handleLogout}>Logout</button></li>
@@ -84,12 +95,12 @@ export default function Navbar() {
             {isMenuOpen && (
                 <div className="bg-base-100 shadow-md flex flex-col md:hidden">
                     <Link to="/hobbies" className="btn btn-ghost w-full rounded-none text-left" onClick={() => setIsMenuOpen(false)}>Hobbies</Link>
-                    <Link to="/#about" className="btn btn-ghost w-full rounded-none text-left" onClick={() => setIsMenuOpen(false)}>About</Link>
-                    <Link to="/#categories" className="btn btn-ghost w-full rounded-none text-left" onClick={() => setIsMenuOpen(false)}>Categories</Link>
+                    <a href="/#about" className="btn btn-ghost w-full rounded-none text-left" onClick={(e) => { handleHashScroll('about')(e); setIsMenuOpen(false); }}>About</a>
+                    <a href="/#categories" className="btn btn-ghost w-full rounded-none text-left" onClick={(e) => { handleHashScroll('categories')(e); setIsMenuOpen(false); }}>Categories</a>
 
                     {isAuthenticated ? (
                         <>
-                            {isAdmin() && (
+                            {isAdmin && (
                                 <Link to="/admin" className="btn btn-ghost w-full rounded-none text-left" onClick={() => setIsMenuOpen(false)}>Admin</Link>
                             )}
                             <div className="divider my-0"></div>
