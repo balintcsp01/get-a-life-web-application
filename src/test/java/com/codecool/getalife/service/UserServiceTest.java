@@ -54,8 +54,8 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        hobby1 = TestEntityFactory.withId(Hobby.builder().name("Chess").description("Board game").min_price(0).max_price(50).difficulty("Beginner").build(), 1L);
-        hobby2 = TestEntityFactory.withId(Hobby.builder().name("Hiking").description("Outdoor activity").min_price(0).max_price(100).difficulty("Intermediate").build(), 2L);
+        hobby1 = TestEntityFactory.withId(Hobby.builder().name("Chess").description("Board game").minPrice(0).maxPrice(50).difficulty("Beginner").build(), 1L);
+        hobby2 = TestEntityFactory.withId(Hobby.builder().name("Hiking").description("Outdoor activity").minPrice(0).maxPrice(100).difficulty("Intermediate").build(), 2L);
         savedUser = TestEntityFactory.withId(User.builder().name("Luna").email("luna@meow.com").password_hash("hashed").hobbies(Set.of(hobby1)).build(), 10L);
     }
 
