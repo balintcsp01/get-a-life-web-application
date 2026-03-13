@@ -27,27 +27,19 @@ const toUserData = (response) => ({
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const clearAuth = () => {
     setUser(null);
-    setAccessToken(null);
     clearSession();
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("accessToken");
+    const hasSession = localStorage.getItem("accessToken") && localStorage.getItem("user");
 
-    if (storedUser && storedToken) {
+    if (hasSession) {
       authApi.me()
-        .then((data) => {
-          const userData = toUserData(data);
-          setUser(userData);
-          setAccessToken(storedToken);
-          localStorage.setItem("user", JSON.stringify(userData));
-        })
+        .then((data) => setUser(toUserData(data)))
         .catch(() => clearAuth())
         .finally(() => setLoading(false));
     } else {
@@ -59,16 +51,12 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener("session-expired", handleSessionExpired);
   }, []);
 
-  const applySession = (response) => {
-    const userData = toUserData(response);
-    setUser(userData);
-    setAccessToken(response.accessToken);
-    storeSession(userData, response.accessToken);
-  };
-
   const login = async (email, password) => {
     try {
-      applySession(await authApi.login(email, password));
+      const response = await authApi.login(email, password);
+      const userData = toUserData(response);
+      setUser(userData);
+      storeSession(userData, response.accessToken);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -77,7 +65,10 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      applySession(await authApi.register(username, email, password));
+      const response = await authApi.register(username, email, password);
+      const userData = toUserData(response);
+      setUser(userData);
+      storeSession(userData, response.accessToken);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -98,7 +89,6 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        accessToken,
         loading,
         login,
         register,
