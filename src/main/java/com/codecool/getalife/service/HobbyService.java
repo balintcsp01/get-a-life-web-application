@@ -65,8 +65,8 @@ public class HobbyService {
                 .name(req.name())
                 .imagePath(imagePath)
                 .description(req.description())
-                .min_price(req.minPrice())
-                .max_price(req.maxPrice())
+                .minPrice(req.minPrice())
+                .maxPrice(req.maxPrice())
                 .categories(categories)
                 .difficulty(req.difficulty())
                 .build();
@@ -93,11 +93,11 @@ public class HobbyService {
         }
 
         if (req.minPrice() != null) {
-            hobby.setMin_price(req.minPrice());
+            hobby.setMinPrice(req.minPrice());
         }
 
         if (req.maxPrice() != null) {
-            hobby.setMax_price(req.maxPrice());
+            hobby.setMaxPrice(req.maxPrice());
         }
 
         if (req.categoryIds() != null) {
@@ -146,8 +146,8 @@ public class HobbyService {
                         .stream()
                         .map(category -> new CategoryNameResponse(category.getId(), category.getName()))
                         .collect(Collectors.toSet()),
-                hobby.getMin_price(),
-                hobby.getMax_price(),
+                hobby.getMinPrice(),
+                hobby.getMaxPrice(),
                 hobby.getDifficulty()
         );
     }

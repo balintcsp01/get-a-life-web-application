@@ -51,8 +51,8 @@ class HobbyServiceTest {
                 .name("Football")
                 .description("desc")
                 .imagePath("img.png")
-                .min_price(10)
-                .max_price(100)
+                .minPrice(10)
+                .maxPrice(100)
                 .difficulty("EASY")
                 .categories(Set.of(category))
                 .build();

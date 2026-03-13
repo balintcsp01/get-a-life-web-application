@@ -3,6 +3,7 @@ package com.codecool.getalife.exception;
 import com.codecool.getalife.exception.auth.InvalidCredentialsException;
 import com.codecool.getalife.exception.auth.InvalidTokenException;
 import com.codecool.getalife.exception.categories.CategoryDuplicateException;
+import com.codecool.getalife.exception.categories.CategoryInUseException;
 import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
 import com.codecool.getalife.exception.hobby.HobbyMissingCategoryException;
@@ -62,6 +63,14 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(CategoryInUseException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryInUse(
+            CategoryInUseException ex,
+            HttpServletRequest request
+    ) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
     @ExceptionHandler({

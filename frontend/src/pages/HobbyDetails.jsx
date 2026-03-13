@@ -142,11 +142,11 @@ function HobbyDetails() {
               )}
             </div>
 
-            {hobby.min_price != null && hobby.max_price != null && (
+            {hobby.minPrice != null && hobby.maxPrice != null && (
               <div className="flex items-center gap-2">
                 <span className="text-base-content/50 text-sm">Estimated cost</span>
                 <span className="text-2xl font-bold text-primary">
-                  ${hobby.min_price} – ${hobby.max_price}
+                  ${hobby.minPrice} – ${hobby.maxPrice}
                 </span>
               </div>
             )}

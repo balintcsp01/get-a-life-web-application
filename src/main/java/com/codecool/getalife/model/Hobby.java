@@ -23,11 +23,11 @@ public class Hobby extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private Integer min_price;
+    @Column(nullable = false, name = "min_price")
+    private Integer minPrice;
 
-    @Column(nullable = false)
-    private Integer max_price;
+    @Column(nullable = false, name = "max_price")
+    private Integer maxPrice;
 
     @Column(nullable = false, columnDefinition = "varchar(255) default 'Beginner'")
     private String difficulty;

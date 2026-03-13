@@ -61,6 +61,8 @@ const handleResponse = async (res) => {
         } catch {}
         throw new Error(message || text || `Request failed with status ${res.status}`);
     }
+
+    if (res.status === 204) return null;
     return res.json();
 };
 
@@ -107,7 +109,7 @@ export const categoryApi = {
         fetchWithAuth(`${API_BASE}/categories/${id}`, {
             method: "DELETE",
             headers: authHeaders(),
-        }),
+        }).then(handleResponse),
 };
 
 export const hobbyApi = {
@@ -143,12 +145,15 @@ export const hobbyApi = {
         fetchWithAuth(`${API_BASE}/hobbies/${id}`, {
             method: "DELETE",
             headers: authHeaders(),
-        }),
+        }).then(handleResponse),
 };
 
 export const suggestionApi = {
-    getAll: () => fetch(`${API_BASE}/suggestions`).then(handleResponse),
-    delete: (id) => fetch(`${API_BASE}/suggestions/${id}`, { method: "DELETE" }),
+    getAll: () =>
+        fetch(`${API_BASE}/suggestions`).then(handleResponse),
+
+    delete: (id) =>
+        fetch(`${API_BASE}/suggestions/${id}`, { method: "DELETE" }).then(handleResponse),
 };
 
 export const wishlistApi = {
@@ -159,11 +164,11 @@ export const wishlistApi = {
         fetchWithAuth(`${API_BASE}/users/me/wishlist/${hobbyId}`, {
             method: "POST",
             headers: authHeaders(),
-        }).then(res => { if (!res.ok) throw new Error("Failed to add to wishlist"); }),
+        }).then(handleResponse),
 
     remove: (hobbyId) =>
         fetchWithAuth(`${API_BASE}/users/me/wishlist/${hobbyId}`, {
             method: "DELETE",
             headers: authHeaders(),
-        }).then(res => { if (!res.ok) throw new Error("Failed to remove from wishlist"); }),
+        }).then(handleResponse),
 };
