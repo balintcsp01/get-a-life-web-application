@@ -39,8 +39,8 @@ class UserIntegrationTest {
         hobby.setName(name);
         hobby.setDescription("Fun activity for testing");
         hobby.setDifficulty("EASY");
-        hobby.setMin_price(10);
-        hobby.setMax_price(50);
+        hobby.setMinPrice(10);
+        hobby.setMaxPrice(50);
         hobby.setCategories(new HashSet<>());
         return hobbyRepository.save(hobby);
     }
