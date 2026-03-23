@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { categoryApi } from '../services/api.js';
+import { SkeletonCategoryList } from './Skeletons.jsx';
 
 export default function CategorySection({ onError, onSuccess }) {
   const [categories, setCategories] = useState([]);
@@ -8,9 +9,9 @@ export default function CategorySection({ onError, onSuccess }) {
   const [adding, setAdding] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
-  const [deleteBlockedBy, setDeleteBlockedBy] = useState(null); // hobby names blocking deletion
+  const [deleteBlockedBy, setDeleteBlockedBy] = useState(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { void load(); }, []);
 
   const load = async () => {
     setLoading(true);
@@ -47,16 +48,8 @@ export default function CategorySection({ onError, onSuccess }) {
       setConfirmDeleteId(null);
       await load();
     } catch (err) {
-      // 409 = category is in use — parse hobby names from the error message
-      // Message format: "Category 'X' is used by N hobby/hobbies: A, B, C"
-      const hobbyMatch = err.message?.match(/:\s*(.+)$/);
-      if (hobbyMatch) {
-        const hobbyNames = hobbyMatch[1].split(',').map((s) => s.trim());
-        setDeleteBlockedBy(hobbyNames);
-      } else {
-        onError?.('Could not delete category.');
-        setConfirmDeleteId(null);
-      }
+      if (err.body?.hobbyNames) setDeleteBlockedBy(err.body.hobbyNames);
+      else { onError?.('Could not delete category.'); setConfirmDeleteId(null); }
     } finally {
       setDeleting(false);
     }
@@ -83,7 +76,7 @@ export default function CategorySection({ onError, onSuccess }) {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-8"><span className="loading loading-spinner" /></div>
+        <SkeletonCategoryList count={6} />
       ) : (
         <div className="bg-base-100 rounded-box border border-base-300 shadow-md overflow-hidden">
           <div className="px-4 py-3 bg-base-200 border-b border-base-300">

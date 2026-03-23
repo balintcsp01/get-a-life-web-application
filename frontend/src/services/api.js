@@ -55,11 +55,12 @@ const fetchWithAuth = async (url, options = {}) => {
 const handleResponse = async (res) => {
     if (!res.ok) {
         const text = await res.text();
-        let message;
-        try {
-            message = JSON.parse(text).message;
-        } catch {}
-        throw new Error(message || text || `Request failed with status ${res.status}`);
+        let body = {};
+        try { body = JSON.parse(text); } catch {}
+        const err = new Error(body.message || text || `Request failed with status ${res.status}`);
+        err.status = res.status;
+        err.body = body;
+        throw err;
     }
 
     if (res.status === 204) return null;

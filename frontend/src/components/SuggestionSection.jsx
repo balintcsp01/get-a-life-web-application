@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { suggestionApi } from '../services/api.js';
+import { SkeletonSuggestionCards } from './Skeletons.jsx';
 
 export default function SuggestionSection({ onOpenModal, onError, categories = [] }) {
   const [suggestions, setSuggestions] = useState([]);
@@ -7,7 +8,7 @@ export default function SuggestionSection({ onOpenModal, onError, categories = [
   const [confirmRejectId, setConfirmRejectId] = useState(null);
   const [rejecting, setRejecting] = useState(false);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { void load(); }, []);
 
   const load = async () => {
     setLoading(true);
@@ -24,7 +25,6 @@ export default function SuggestionSection({ onOpenModal, onError, categories = [
       .map((name) => categories.find((c) => c.name.toLowerCase() === name.toLowerCase())?.id)
       .filter(Boolean);
 
-    // Names that didn't match any existing category — pass as custom tags
     const existingNames = categories.map((c) => c.name.toLowerCase());
     const customCategoryNames = (suggestion.categories ?? [])
       .filter((name) => !existingNames.includes(name.toLowerCase()));
@@ -59,11 +59,7 @@ export default function SuggestionSection({ onOpenModal, onError, categories = [
 
   const confirmingSuggestion = suggestions.find((s) => s.id === confirmRejectId);
 
-  if (loading) return (
-    <div className="flex justify-center py-16">
-      <span className="loading loading-spinner loading-lg" />
-    </div>
-  );
+  if (loading) return <SkeletonSuggestionCards count={3} />;
 
   return (
     <div>
@@ -107,7 +103,6 @@ export default function SuggestionSection({ onOpenModal, onError, categories = [
         </div>
       )}
 
-      {/* Inline reject confirm modal */}
       {confirmRejectId && (
         <div className="modal modal-open">
           <div className="modal-box max-w-sm">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { hobbyApi } from '../services/api.js';
+import { SkeletonHobbyTableRows } from './Skeletons.jsx';
 
 export default function HobbySection({onOpenModal, reloadRef, onError }) {
   const [hobbies, setHobbies] = useState([]);
@@ -54,12 +55,6 @@ export default function HobbySection({onOpenModal, reloadRef, onError }) {
 
   const confirmingHobby = hobbies.find((h) => h.id === confirmDeleteId);
 
-  if (loading) return (
-    <div className="flex justify-center py-16">
-      <span className="loading loading-spinner loading-lg" />
-    </div>
-  );
-
   return (
     <div>
       <div className="flex justify-end mb-4">
@@ -80,7 +75,9 @@ export default function HobbySection({onOpenModal, reloadRef, onError }) {
             </tr>
           </thead>
           <tbody>
-            {hobbies.length === 0 ? (
+            {loading ? (
+              <SkeletonHobbyTableRows count={6} />
+            ) : hobbies.length === 0 ? (
               <tr>
                 <td colSpan={5} className="text-center py-8 text-base-content/40">No hobbies yet.</td>
               </tr>

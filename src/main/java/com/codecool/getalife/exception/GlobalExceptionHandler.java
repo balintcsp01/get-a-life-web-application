@@ -9,6 +9,7 @@ import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
 import com.codecool.getalife.exception.hobby.HobbyMissingCategoryException;
 import com.codecool.getalife.exception.hobby.HobbyNotFoundException;
 import com.codecool.getalife.exception.user.*;
+import com.codecool.getalife.model.dto.error.CategoryInUseResponse;
 import com.codecool.getalife.model.dto.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -66,11 +67,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CategoryInUseException.class)
-    public ResponseEntity<ErrorResponse> handleCategoryInUse(
-            CategoryInUseException ex,
-            HttpServletRequest request
-    ) {
-        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
+    public ResponseEntity<CategoryInUseResponse> handleCategoryInUse(CategoryInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new CategoryInUseResponse(ex.getMessage(), ex.getHobbyNames()));
     }
 
     @ExceptionHandler({

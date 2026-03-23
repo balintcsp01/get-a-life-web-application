@@ -4,6 +4,7 @@ import { hobbyApi, categoryApi, wishlistApi } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import HobbyCard from "../components/HobbyCard.jsx";
 import SuggestHobbyModal from "../components/SuggestHobbyModal.jsx";
+import { SkeletonHobbyGrid, SkeletonFilterBar } from "../components/Skeletons.jsx";
 
 const MAX_PRICE = 90_000_000;
 
@@ -63,7 +64,7 @@ function Hobbies() {
         setLoading(false);
       }
     };
-    fetchData();
+    void fetchData();
   }, []);
 
   useEffect(() => {
@@ -73,7 +74,6 @@ function Hobbies() {
       .catch(() => setWishlist([]));
   }, [isAuthenticated]);
 
-  // Apply category from URL query param
   useEffect(() => {
     const categoryParam = searchParams.get("category");
     if (categoryParam) setCategoryFilter(categoryParam.toLowerCase());
@@ -265,16 +265,19 @@ function Hobbies() {
           )}
         </div>
 
-        {/* Loading / Error */}
-        {loading && (
-          <div className="flex justify-center py-12">
-            <span className="loading loading-spinner loading-lg" />
-          </div>
-        )}
+        {/* Error */}
         {error && <div className="alert alert-error mb-4"><span>{error}</span></div>}
 
         {/* Results */}
-        {!loading && !error && (
+        {loading ? (
+          <>
+            <SkeletonFilterBar />
+            <div className="mt-8">
+              <div className="skeleton h-7 w-48 rounded mb-4" />
+              <SkeletonHobbyGrid count={8} />
+            </div>
+          </>
+        ) : !error && (
           <>
             {savedHobbies.length > 0 && (
               <section className="mb-10">

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import { useAuth } from '../contexts/AuthContext';
 import { hobbyApi, wishlistApi } from '../services/api';
+import { SkeletonHobbyDetails } from '../components/Skeletons.jsx';
 
 const DIFFICULTY_STYLES = {
   Beginner:     "bg-green-100 text-green-700",
@@ -52,11 +53,7 @@ function HobbyDetails() {
     }
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center min-h-[60vh]" data-theme="retro">
-      <span className="loading loading-spinner loading-lg" />
-    </div>
-  );
+  if (loading) return <SkeletonHobbyDetails />;
 
   if (error) return (
     <div className="flex flex-col justify-center items-center gap-4 min-h-[60vh]" data-theme="retro">
