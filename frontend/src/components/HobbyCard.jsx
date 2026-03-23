@@ -15,7 +15,7 @@ function HobbyCard({ hobby, saved = false, onToggleSave }) {
     : description;
 
   const priceRange = hobby?.minPrice != null && hobby?.maxPrice != null
-    ? `${hobby.minPrice} - ${hobby.maxPrice}`
+    ? `$${hobby.minPrice} - $${hobby.maxPrice}`
     : null;
 
   const hasImage =

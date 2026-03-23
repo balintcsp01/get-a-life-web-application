@@ -129,6 +129,7 @@ export default function AdminPage() {
           )}
           {tab === 'suggestions' && (
             <SuggestionSection
+              categories={categories}
               onError={(msg) => addToast(msg, 'error')}
               onOpenModal={(opts) => {
                 setTab('hobbies');
@@ -145,6 +146,7 @@ export default function AdminPage() {
         onSaved={handleSaved}
         onError={(msg) => addToast(msg, 'error')}
         categories={categories}
+        onCategoryCreated={() => categoryApi.getAll().then(setCategories).catch(() => {})}
         editingId={modalEditingId}
         initialData={modalInitialData}
       />

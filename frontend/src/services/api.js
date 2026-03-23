@@ -150,10 +150,20 @@ export const hobbyApi = {
 
 export const suggestionApi = {
     getAll: () =>
-        fetch(`${API_BASE}/suggestions`).then(handleResponse),
+        fetchWithAuth(`${API_BASE}/suggestions`, { headers: authHeaders() }).then(handleResponse),
+
+    create: (data) =>
+        fetchWithAuth(`${API_BASE}/suggestions`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify(data),
+        }).then(handleResponse),
 
     delete: (id) =>
-        fetch(`${API_BASE}/suggestions/${id}`, { method: "DELETE" }).then(handleResponse),
+        fetchWithAuth(`${API_BASE}/suggestions/${id}`, {
+            method: "DELETE",
+            headers: authHeaders(),
+        }).then(handleResponse),
 };
 
 export const wishlistApi = {

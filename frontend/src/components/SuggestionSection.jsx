@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { suggestionApi } from '../services/api.js';
 
-export default function SuggestionSection({ onOpenModal, onError }) {
+export default function SuggestionSection({ onOpenModal, onError, categories = [] }) {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmRejectId, setConfirmRejectId] = useState(null);
@@ -20,14 +20,24 @@ export default function SuggestionSection({ onOpenModal, onError }) {
   };
 
   const handleReview = (suggestion) => {
+    const categoryIds = (suggestion.categories ?? [])
+      .map((name) => categories.find((c) => c.name.toLowerCase() === name.toLowerCase())?.id)
+      .filter(Boolean);
+
+    // Names that didn't match any existing category — pass as custom tags
+    const existingNames = categories.map((c) => c.name.toLowerCase());
+    const customCategoryNames = (suggestion.categories ?? [])
+      .filter((name) => !existingNames.includes(name.toLowerCase()));
+
     onOpenModal({
       initialData: {
         name: suggestion.name ?? '',
         description: suggestion.description ?? '',
-        categoryIds: suggestion.category_id ? [suggestion.category_id] : [],
+        categoryIds,
+        customCategoryNames,
         difficulty: suggestion.difficulty ?? 'Beginner',
-        minPrice: suggestion.min_price ?? 0,
-        maxPrice: suggestion.max_price ?? 0,
+        minPrice: suggestion.minPrice ?? 0,
+        maxPrice: suggestion.maxPrice ?? 0,
       },
       suggestionId: suggestion.id,
     });
@@ -73,11 +83,14 @@ export default function SuggestionSection({ onOpenModal, onError }) {
                   {s.description && (
                     <p className="text-sm text-base-content/60 mt-1 max-w-lg line-clamp-2">{s.description}</p>
                   )}
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {s.difficulty && <span className="badge badge-sm badge-outline">{s.difficulty}</span>}
-                    {(s.min_price != null || s.max_price != null) && (
-                      <span className="badge badge-sm badge-outline">${s.min_price ?? 0} – ${s.max_price ?? 0}</span>
+                    {(s.minPrice != null || s.maxPrice != null) && (
+                      <span className="badge badge-sm badge-outline">${s.minPrice ?? 0} – ${s.maxPrice ?? 0}</span>
                     )}
+                    {s.categories?.map((cat) => (
+                      <span key={cat} className="badge badge-sm badge-primary badge-outline">{cat}</span>
+                    ))}
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0 ml-4">

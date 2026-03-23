@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { hobbyApi } from '../services/api.js';
+import { useState, useEffect, useRef } from 'react';
+import { hobbyApi, categoryApi } from '../services/api.js';
 
 const DIFFICULTIES = ["Beginner", "Intermediate", "Advanced"];
 
@@ -12,12 +12,23 @@ const emptyForm = {
   maxPrice: 0,
 };
 
-export default function HobbyModal({ isOpen, onClose, onSaved, onError, categories, initialData = null, editingId = null }) {
+export default function HobbyModal({
+  isOpen, onClose, onSaved, onError,
+  categories, onCategoryCreated,
+  initialData = null, editingId = null,
+}) {
   const [form, setForm] = useState(emptyForm);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
   const [saving, setSaving] = useState(false);
+
+  // Quick-add category state
+  const [newCatInput, setNewCatInput] = useState('');
+  const [pendingCustomCategories, setPendingCustomCategories] = useState([]); // names not yet in DB
+  const [addingCat, setAddingCat] = useState(false);
+  const [catError, setCatError] = useState(null);
+  const newCatRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -25,6 +36,9 @@ export default function HobbyModal({ isOpen, onClose, onSaved, onError, categori
       setImage(null);
       setImagePreview(null);
       setFieldErrors({});
+      setNewCatInput('');
+      setCatError(null);
+      setPendingCustomCategories(initialData?.customCategoryNames ?? []);
     }
   }, [isOpen, initialData]);
 
@@ -39,11 +53,7 @@ export default function HobbyModal({ isOpen, onClose, onSaved, onError, categori
     const file = e.target.files[0] || null;
     setImage(file);
     setFieldErrors((fe) => ({ ...fe, image: null }));
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    } else {
-      setImagePreview(null);
-    }
+    setImagePreview(file ? URL.createObjectURL(file) : null);
   };
 
   const handleCategoryToggle = (id) => {
@@ -54,6 +64,35 @@ export default function HobbyModal({ isOpen, onClose, onSaved, onError, categori
         : [...f.categoryIds, id],
     }));
     setFieldErrors((fe) => ({ ...fe, categoryIds: null }));
+  };
+
+  const createCategory = async (name, { removeFromPending = false } = {}) => {
+    setAddingCat(true);
+    setCatError(null);
+    try {
+      const created = await categoryApi.create(name);
+      if (removeFromPending) {
+        setPendingCustomCategories((prev) => prev.filter((n) => n !== name));
+      } else {
+        setNewCatInput('');
+      }
+      setForm((f) => ({ ...f, categoryIds: [...f.categoryIds, created.id] }));
+      setFieldErrors((fe) => ({ ...fe, categoryIds: null }));
+      onCategoryCreated?.();
+      newCatRef.current?.focus();
+    } catch (err) {
+      setCatError(err.message?.includes('409') || err.message?.toLowerCase().includes('conflict')
+        ? 'Category already exists.'
+        : (err.message || 'Could not create category.'));
+    } finally {
+      setAddingCat(false);
+    }
+  };
+
+  const handleQuickAddCategory = () => createCategory(newCatInput.trim());
+
+  const handleCatKeyDown = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); handleQuickAddCategory(); }
   };
 
   const validate = () => {
@@ -68,10 +107,7 @@ export default function HobbyModal({ isOpen, onClose, onSaved, onError, categori
 
   const handleSubmit = async () => {
     const errors = validate();
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      return;
-    }
+    if (Object.keys(errors).length > 0) { setFieldErrors(errors); return; }
 
     setSaving(true);
     try {
@@ -167,8 +203,10 @@ export default function HobbyModal({ isOpen, onClose, onSaved, onError, categori
               </div>
             </div>
 
+            {/* RIGHT COLUMN */}
             <div className="flex flex-col gap-4">
 
+              {/* Image */}
               <div className="form-control">
                 <label className="label-text mb-1 text-xs font-bold uppercase tracking-widest text-base-content/60">
                   Image {!editingId && <span className="text-error">*</span>}
@@ -199,11 +237,14 @@ export default function HobbyModal({ isOpen, onClose, onSaved, onError, categori
                 {fieldErrors.image && <p className="text-error text-xs mt-1">{fieldErrors.image}</p>}
               </div>
 
+              {/* Categories */}
               <div className="form-control">
                 <label className="label-text mb-2 text-xs font-bold uppercase tracking-widest text-base-content/60">
                   Categories
                 </label>
-                <div className="flex flex-wrap gap-2">
+
+                {/* Existing category badges */}
+                <div className="flex flex-wrap gap-2 mb-3">
                   {categories.map((cat) => (
                     <button
                       key={cat.id}
@@ -219,9 +260,54 @@ export default function HobbyModal({ isOpen, onClose, onSaved, onError, categori
                     </button>
                   ))}
                 </div>
+
+                {/* Pending custom categories from suggestion — need to be created */}
+                {pendingCustomCategories.length > 0 && (
+                  <div className="bg-warning/10 border border-warning/30 rounded-lg p-3 mb-1">
+                    <p className="text-xs font-bold uppercase tracking-widest text-warning mb-2">Suggested new categories</p>
+                    <div className="flex flex-wrap gap-2">
+                      {pendingCustomCategories.map((name) => (
+                        <button
+                          key={name}
+                          type="button"
+                          className="badge badge-warning gap-1 cursor-pointer hover:opacity-80"
+                          onClick={() => createCategory(name, { removeFromPending: true })}
+                          disabled={addingCat}
+                          title={`Click to create "${name}" and add it`}
+                        >
+                          + {name}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-warning/70 mt-2">Click a badge to create the category and add it to this hobby.</p>
+                  </div>
+                )}
+
+                {/* Quick-add input */}
+                <div className="flex gap-2">
+                  <input
+                    ref={newCatRef}
+                    className={`input input-bordered input-sm flex-1 focus:input-primary ${catError ? 'input-error' : ''}`}
+                    placeholder="New category…"
+                    value={newCatInput}
+                    onChange={(e) => { setNewCatInput(e.target.value); setCatError(null); }}
+                    onKeyDown={handleCatKeyDown}
+                    disabled={addingCat}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline btn-primary"
+                    onClick={handleQuickAddCategory}
+                    disabled={addingCat || !newCatInput.trim()}
+                  >
+                    {addingCat ? <span className="loading loading-spinner loading-xs" /> : '+ Add'}
+                  </button>
+                </div>
+                {catError && <p className="text-error text-xs mt-1">{catError}</p>}
                 {fieldErrors.categoryIds && <p className="text-error text-xs mt-1">{fieldErrors.categoryIds}</p>}
               </div>
 
+              {/* Difficulty */}
               <div className="form-control">
                 <label className="label-text mb-2 text-xs font-bold uppercase tracking-widest text-base-content/60">
                   Difficulty
