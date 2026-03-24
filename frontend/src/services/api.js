@@ -55,12 +55,15 @@ const fetchWithAuth = async (url, options = {}) => {
 const handleResponse = async (res) => {
     if (!res.ok) {
         const text = await res.text();
-        let message;
-        try {
-            message = JSON.parse(text).message;
-        } catch {}
-        throw new Error(message || text || `Request failed with status ${res.status}`);
+        let body = {};
+        try { body = JSON.parse(text); } catch {}
+        const err = new Error(body.message || text || `Request failed with status ${res.status}`);
+        err.status = res.status;
+        err.body = body;
+        throw err;
     }
+
+    if (res.status === 204) return null;
     return res.json();
 };
 
@@ -107,7 +110,7 @@ export const categoryApi = {
         fetchWithAuth(`${API_BASE}/categories/${id}`, {
             method: "DELETE",
             headers: authHeaders(),
-        }),
+        }).then(handleResponse),
 };
 
 export const hobbyApi = {
@@ -143,12 +146,25 @@ export const hobbyApi = {
         fetchWithAuth(`${API_BASE}/hobbies/${id}`, {
             method: "DELETE",
             headers: authHeaders(),
-        }),
+        }).then(handleResponse),
 };
 
 export const suggestionApi = {
-    getAll: () => fetch(`${API_BASE}/suggestions`).then(handleResponse),
-    delete: (id) => fetch(`${API_BASE}/suggestions/${id}`, { method: "DELETE" }),
+    getAll: () =>
+        fetchWithAuth(`${API_BASE}/suggestions`, { headers: authHeaders() }).then(handleResponse),
+
+    create: (data) =>
+        fetchWithAuth(`${API_BASE}/suggestions`, {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify(data),
+        }).then(handleResponse),
+
+    delete: (id) =>
+        fetchWithAuth(`${API_BASE}/suggestions/${id}`, {
+            method: "DELETE",
+            headers: authHeaders(),
+        }).then(handleResponse),
 };
 
 export const wishlistApi = {
@@ -159,11 +175,11 @@ export const wishlistApi = {
         fetchWithAuth(`${API_BASE}/users/me/wishlist/${hobbyId}`, {
             method: "POST",
             headers: authHeaders(),
-        }).then(res => { if (!res.ok) throw new Error("Failed to add to wishlist"); }),
+        }).then(handleResponse),
 
     remove: (hobbyId) =>
         fetchWithAuth(`${API_BASE}/users/me/wishlist/${hobbyId}`, {
             method: "DELETE",
             headers: authHeaders(),
-        }).then(res => { if (!res.ok) throw new Error("Failed to remove from wishlist"); }),
+        }).then(handleResponse),
 };

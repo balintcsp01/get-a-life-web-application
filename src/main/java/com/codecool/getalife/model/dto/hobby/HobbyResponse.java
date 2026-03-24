@@ -10,7 +10,7 @@ public record HobbyResponse(
         String imageUrl,
         String description,
         Set<CategoryNameResponse> categories,
-        Integer min_price,
-        Integer max_price,
+        Integer minPrice,
+        Integer maxPrice,
         String difficulty
 ) {}

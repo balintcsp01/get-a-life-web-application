@@ -1,239 +1,135 @@
-import React, { useState, useEffect } from 'react';
-import { categoryApi, hobbyApi } from '../services/api.js';
-import Badge from "daisyui/components/badge/index.js";
+import { useState, useEffect } from 'react';
+import { hobbyApi } from '../services/api.js';
+import { SkeletonHobbyTableRows } from './Skeletons.jsx';
 
-function HobbySection() {
-  const initialFormState = {
-    name: '',
-    categoryIds: [],
-    min_price: 0,
-    max_price: 0,
-    description: '',
-    difficulty: ''
-  };
-  const [categories, setCategories] = useState([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState("Beginner");
+export default function HobbySection({onOpenModal, reloadRef, onError }) {
   const [hobbies, setHobbies] = useState([]);
-  const [formData, setFormData] = useState(initialFormState);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const difficulties = ["Beginner", "Intermediate", "Advanced"];
+  useEffect(() => {
+    void load();
+    if (reloadRef) reloadRef.current = load;
+  }, []);
 
-  useEffect(() => { loadAllData(); }, []);
-
-  const loadAllData = async () => {
+  const load = async () => {
+    setLoading(true);
     try {
-      const [catData, hobbyData] = await Promise.all([categoryApi.getAll(), hobbyApi.getAll()]);
-      setCategories(catData);
-      setHobbies(hobbyData);
-    } catch (err) { console.error(err); }
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-    }
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingId) {
-        await hobbyApi.update(editingId, formData, selectedImage);
-      } else {
-        if (!selectedImage) {
-          alert("Please select an image");
-          return;
-        }
-        await hobbyApi.create(formData, selectedImage);
-      }
-      setFormData(initialFormState);
-      setSelectedImage(null)
-      setEditingId(null);
-      loadAllData();
+      const data = await hobbyApi.getAll();
+      setHobbies(Array.isArray(data) ? data : Object.values(data));
     } catch (err) {
-      console.log(err);
-      alert("Error: " + (err.message || "Failed to save hobby"));
+      onError?.('Failed to load hobbies.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCategoryChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => Number(option.value));
-    setFormData({...formData, categoryIds: selectedOptions});
+  const handleDelete = async () => {
+    if (!confirmDeleteId) return;
+    setDeleting(true);
+    try {
+      await hobbyApi.delete(confirmDeleteId);
+      setConfirmDeleteId(null);
+      await load();
+    } catch {
+      onError?.('Failed to delete hobby.');
+    } finally {
+      setDeleting(false);
+    }
   };
+
+  const handleEdit = (hobby) => {
+    onOpenModal({
+      editingId: hobby.id,
+      initialData: {
+        name: hobby.name,
+        description: hobby.description,
+        categoryIds: hobby.categories?.map((c) => c.id) ?? [],
+        difficulty: hobby.difficulty ?? 'Beginner',
+        minPrice: hobby.minPrice ?? 0,
+        maxPrice: hobby.maxPrice ?? 0,
+      },
+    });
+  };
+
+  const confirmingHobby = hobbies.find((h) => h.id === confirmDeleteId);
 
   return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* FORM CARD */}
-        <div className="card bg-base-200 shadow-xl p-6 h-fit border-2 border-base-300">
-          <h2 className="card-title mb-4 text-2xl font-bold">
-            {editingId ? "Edit Hobby" : "Create New Hobby"}
-          </h2>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <input
-                className="input input-bordered focus:input-primary"
-                placeholder="Hobby name"
-                value={formData.name}
-                onChange={e => setFormData({...formData, name: e.target.value})}
-                required
-            />
+    <div>
+      <div className="flex justify-end mb-4">
+        <button className="btn btn-primary" onClick={() => onOpenModal({})}>
+          + New Hobby
+        </button>
+      </div>
 
-            <div className="form-control">
-              <label className="label-text mb-1 ml-1 text-xs">Categories</label>
-              <select
-                  className="select select-bordered"
-                  multiple
-                  size="3"
-                  value={formData.categoryIds}
-                  onChange={handleCategoryChange}
-                  required
-              >
-                {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex gap-2">
-              {difficulties.map((level) => (
-                  <button
-                      key={level}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, difficulty: level })}
-                      className={`badge cursor-pointer ${
-                          formData.difficulty === level ? "badge-primary" : "badge-outline"
-                      }`}
-                  >
-                    {level}
-                  </button>
-              ))}
-            </div>
-
-            <div className="flex gap-2">
-              <div className="form-control w-1/2">
-                <label className="label-text mb-1 ml-1 text-xs">Min Price</label>
-                <input
-                    type="number"
-                    className="input input-bordered"
-                    value={formData.minPrice}
-                    onChange={e => setFormData({...formData, minPrice: Number(e.target.value)})}
-                    required
-                />
-              </div>
-              <div className="form-control w-1/2">
-                <label className="label-text mb-1 ml-1 text-xs">Max Price</label>
-                <input
-                    type="number"
-                    className="input input-bordered"
-                    value={formData.maxPrice}
-                    onChange={e => setFormData({...formData, maxPrice: Number(e.target.value)})}
-                    required
-                />
-              </div>
-            </div>
-
-            <textarea
-                className="textarea textarea-bordered h-24"
-                placeholder="Description"
-                value={formData.description}
-                onChange={e => setFormData({...formData, description: e.target.value})}
-                required
-            />
-
-            <div className="form-control">
-              <label className="label-text mb-1 ml-1 text-xs">
-                Hobby Image {!editingId && <span className="text-error">*</span>}
-              </label>
-              <input
-                  type="file"
-                  className="file-input file-input-bordered w-full"
-                  accept="image/png,image/jpeg,image/jpg"
-                  onChange={handleImageChange}
-                  required={!editingId}
-              />
-              {selectedImage && (
-                  <div className="text-sm text-gray-600 mt-1">
-                    Selected: {selectedImage.name}
-                  </div>
-              )}
-            </div>
-
-            <div className="card-actions justify-end mt-4">
-              <button type="submit" className="btn btn-primary flex-1">
-                {editingId ? "Update" : "Save"}
-              </button>
-              {(editingId || formData.name !== '') && (
-                  <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={() => {
-                        setEditingId(null);
-                        setFormData(initialFormState);
-                        setSelectedImage(null);
-                      }}
-                  >
-                    Cancel
-                  </button>
-              )}
-            </div>
-          </form>
-        </div>
-
-        {/* TABLE */}
-        <div className="lg:col-span-2 overflow-x-auto bg-base-100 rounded-box border border-base-300">
-          <table className="table table-zebra w-full">
-            <thead className="bg-base-300">
+      <div className="overflow-x-auto bg-base-100 rounded-box border border-base-300">
+        <table className="table table-zebra w-full">
+          <thead className="bg-base-300">
             <tr>
               <th>Name</th>
               <th>Categories</th>
-              <th>Price Range</th>
+              <th>Difficulty</th>
+              <th>Price</th>
               <th className="text-right">Actions</th>
             </tr>
-            </thead>
-            <tbody>
-            {hobbies.map(h => (
-                <tr key={h.id} className="hover">
-                  <td className="font-bold">{h.name}</td>
-                  <td>
-                    {h.categories?.map(cat => (
-                        <div key={cat.id} className="badge badge-outline mr-1">
-                          {cat.name}
-                        </div>
+          </thead>
+          <tbody>
+            {loading ? (
+              <SkeletonHobbyTableRows count={6} />
+            ) : hobbies.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="text-center py-8 text-base-content/40">No hobbies yet.</td>
+              </tr>
+            ) : hobbies.map((h) => (
+              <tr key={h.id} className="hover">
+                <td className="font-semibold">{h.name}</td>
+                <td>
+                  <div className="flex flex-wrap gap-1">
+                    {h.categories?.map((cat) => (
+                      <span key={cat.id} className="badge badge-outline badge-sm">{cat.name}</span>
                     ))}
-                  </td>
-                  <td>{h.min_price} - {h.max_price} $</td>
-                  <td className="text-right flex justify-end gap-2">
+                  </div>
+                </td>
+                <td>
+                  <span className={`badge badge-sm ${
+                    h.difficulty === 'Advanced' ? 'badge-error' :
+                    h.difficulty === 'Intermediate' ? 'badge-warning' : 'badge-success'
+                  }`}>{h.difficulty}</span>
+                </td>
+                <td className="text-sm">${h.minPrice} – ${h.maxPrice}</td>
+                <td>
+                  <div className="flex justify-end gap-2">
+                    <button className="btn btn-sm btn-ghost btn-circle" onClick={() => handleEdit(h)}>✎</button>
                     <button
-                        className="btn btn-sm btn-circle btn-ghost"
-                        onClick={() => {
-                          setEditingId(h.id);
-                          setFormData({
-                            name: h.name,
-                            description: h.description,
-                            minPrice: h.min_price,
-                            maxPrice: h.max_price,
-                            categoryIds: h.categories?.map(c => c.id) || []
-                          });
-                        }}
-                    >
-                      ✎
-                    </button>
-                    <button
-                        className="btn btn-sm btn-circle btn-error btn-outline"
-                        onClick={() => hobbyApi.delete(h.id).then(loadAllData)}
-                    >
-                      ✕
-                    </button>
-                  </td>
-                </tr>
+                      className="btn btn-sm btn-circle btn-error btn-outline"
+                      onClick={() => setConfirmDeleteId(h.id)}
+                    >✕</button>
+                  </div>
+                </td>
+              </tr>
             ))}
-            </tbody>
-          </table>
-        </div>
+          </tbody>
+        </table>
       </div>
+
+      {confirmDeleteId && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm">
+            <h3 className="font-bold text-lg mb-2">Delete Hobby</h3>
+            <p className="text-base-content/70">
+              Are you sure you want to delete <span className="font-semibold text-base-content">"{confirmingHobby?.name}"</span>? This cannot be undone.
+            </p>
+            <div className="modal-action">
+              <button className="btn btn-ghost" onClick={() => setConfirmDeleteId(null)} disabled={deleting}>Cancel</button>
+              <button className="btn btn-error" onClick={handleDelete} disabled={deleting}>
+                {deleting ? <span className="loading loading-spinner loading-sm" /> : 'Delete'}
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop bg-black/40" onClick={() => !deleting && setConfirmDeleteId(null)} />
+        </div>
+      )}
+    </div>
   );
 }
-
-export default HobbySection;

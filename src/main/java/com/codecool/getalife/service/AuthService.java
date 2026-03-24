@@ -7,6 +7,7 @@ import com.codecool.getalife.exception.user.UserNotFoundException;
 import com.codecool.getalife.model.User;
 import com.codecool.getalife.model.dto.auth.AuthResponse;
 import com.codecool.getalife.model.dto.auth.LoginRequest;
+import com.codecool.getalife.model.dto.auth.MeResponse;
 import com.codecool.getalife.model.dto.auth.RegisterRequest;
 import com.codecool.getalife.repository.UserRepository;
 import com.codecool.getalife.security.JwtUtil;
@@ -40,16 +41,19 @@ public class AuthService {
             throw new UserDuplicateException("Email already exists");
         }
 
-        User user = User.builder()
+        User user = userRepository.save(User.builder()
                 .name(request.username())
                 .email(request.email())
                 .password_hash(passwordEncoder.encode(request.password()))
                 .roles(Set.of("USER"))
-                .build();
+                .build());
 
-        userRepository.save(user);
+        // Authenticate directly instead of going through login() to avoid a redundant DB lookup
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getEmail(), null, user.getAuthorities()
+        );
 
-        return login(new LoginRequest(request.email(), request.password()));
+        return toAuthResponse(user, authentication);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -61,10 +65,7 @@ public class AuthService {
             User user = userRepository.findByEmail(request.email())
                     .orElseThrow(UserNotFoundException::new);
 
-            String accessToken = jwtUtil.generateAccessToken(authentication);
-            String refreshToken = jwtUtil.generateRefreshToken(authentication);
-
-            return new AuthResponse(accessToken, refreshToken, user.getEmail(), user.getName(), buildRoles(user));
+            return toAuthResponse(user, authentication);
         } catch (BadCredentialsException e) {
             throw new InvalidCredentialsException();
         }
@@ -79,25 +80,30 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
 
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(user.getEmail(), null, user.getAuthorities());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getEmail(), null, user.getAuthorities()
+        );
 
-        String newAccessToken = jwtUtil.generateAccessToken(authentication);
-        String newRefreshToken = jwtUtil.generateRefreshToken(authentication);
-
-        return new AuthResponse(newAccessToken, newRefreshToken, user.getEmail(), user.getName(), buildRoles(user));
+        return toAuthResponse(user, authentication);
     }
 
-    public AuthResponse me(String email) {
+    public MeResponse me(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
-        return new AuthResponse(null, null, user.getEmail(), user.getName(), buildRoles(user));
+        return new MeResponse(user.getEmail(), user.getName(), buildRoles(user));
+    }
+
+    private AuthResponse toAuthResponse(User user, Authentication authentication) {
+        return new AuthResponse(
+                jwtUtil.generateAccessToken(authentication),
+                jwtUtil.generateRefreshToken(authentication),
+                user.getEmail(),
+                user.getName(),
+                buildRoles(user)
+        );
     }
 
     private List<String> buildRoles(User user) {
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            return List.of("ROLE_USER");
-        }
         return user.getRoles().stream()
                 .map(role -> "ROLE_" + role)
                 .toList();

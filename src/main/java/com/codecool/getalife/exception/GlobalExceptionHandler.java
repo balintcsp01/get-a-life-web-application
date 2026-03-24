@@ -3,11 +3,13 @@ package com.codecool.getalife.exception;
 import com.codecool.getalife.exception.auth.InvalidCredentialsException;
 import com.codecool.getalife.exception.auth.InvalidTokenException;
 import com.codecool.getalife.exception.categories.CategoryDuplicateException;
+import com.codecool.getalife.exception.categories.CategoryInUseException;
 import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.exception.hobby.HobbyDuplicateException;
 import com.codecool.getalife.exception.hobby.HobbyMissingCategoryException;
 import com.codecool.getalife.exception.hobby.HobbyNotFoundException;
 import com.codecool.getalife.exception.user.*;
+import com.codecool.getalife.model.dto.error.CategoryInUseResponse;
 import com.codecool.getalife.model.dto.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +64,12 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(CategoryInUseException.class)
+    public ResponseEntity<CategoryInUseResponse> handleCategoryInUse(CategoryInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new CategoryInUseResponse(ex.getMessage(), ex.getHobbyNames()));
     }
 
     @ExceptionHandler({

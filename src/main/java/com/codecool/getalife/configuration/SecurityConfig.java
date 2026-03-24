@@ -37,8 +37,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/me").authenticated()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/images/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/hobbies").permitAll()
@@ -50,6 +50,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/categories/*").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/suggestions").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/suggestions").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/suggestions/*").hasRole("ADMIN")
 
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/users/me/**").hasAnyRole("USER", "ADMIN")

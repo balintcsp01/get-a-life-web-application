@@ -1,14 +1,18 @@
 package com.codecool.getalife.service;
 
 import com.codecool.getalife.exception.categories.CategoryDuplicateException;
+import com.codecool.getalife.exception.categories.CategoryInUseException;
 import com.codecool.getalife.exception.categories.CategoryNotFoundException;
 import com.codecool.getalife.model.Category;
+import com.codecool.getalife.model.Hobby;
 import com.codecool.getalife.model.dto.category.CategoryCreateRequest;
 import com.codecool.getalife.model.dto.category.CategoryNameResponse;
 import com.codecool.getalife.repository.CategoryRepository;
+import com.codecool.getalife.repository.HobbyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +21,7 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final HobbyRepository hobbyRepository;
 
     public CategoryNameResponse get(Long id) {
         var category = categoryRepository.findById(id).orElseThrow(
@@ -58,6 +63,15 @@ public class CategoryService {
     public void delete(Long id) {
         var category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException(id.toString()));
+
+        List<String> assignedHobbies = hobbyRepository.findByCategoriesId(id)
+                .stream()
+                .map(Hobby::getName)
+                .toList();
+
+        if (!assignedHobbies.isEmpty()) {
+            throw new CategoryInUseException(category.getName(), assignedHobbies);
+        }
 
         categoryRepository.delete(category);
     }

@@ -64,19 +64,16 @@ public class JwtUtil {
     }
 
     public String getEmailFromToken(String token, boolean isRefreshToken) {
-        SecretKey key = isRefreshToken ? refreshTokenKey : accessTokenKey;
-        return Jwts.parser()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return parseClaims(token, isRefreshToken).getSubject();
+    }
+
+    public String getRolesFromToken(String token) {
+        return parseClaims(token, false).get("roles", String.class);
     }
 
     public boolean validateToken(String token, boolean isRefreshToken) {
         try {
-            SecretKey key = isRefreshToken ? refreshTokenKey : accessTokenKey;
-            Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
+            parseClaims(token, isRefreshToken);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -86,18 +83,9 @@ public class JwtUtil {
     private Claims parseClaims(String token, boolean isRefreshToken) {
         SecretKey key = isRefreshToken ? refreshTokenKey : accessTokenKey;
         return Jwts.parser()
-                .setSigningKey(key)
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
-    public String getRolesFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(accessTokenKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("roles", String.class);
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

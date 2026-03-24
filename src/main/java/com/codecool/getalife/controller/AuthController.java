@@ -2,6 +2,7 @@ package com.codecool.getalife.controller;
 
 import com.codecool.getalife.model.dto.auth.AuthResponse;
 import com.codecool.getalife.model.dto.auth.LoginRequest;
+import com.codecool.getalife.model.dto.auth.MeResponse;
 import com.codecool.getalife.model.dto.auth.RegisterRequest;
 import com.codecool.getalife.service.AuthService;
 import jakarta.servlet.http.Cookie;
@@ -60,7 +61,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<AuthResponse> me(@AuthenticationPrincipal String email) {
+    public ResponseEntity<MeResponse> me(@AuthenticationPrincipal String email) {
         return ResponseEntity.ok(authService.me(email));
     }
 

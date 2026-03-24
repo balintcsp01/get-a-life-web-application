@@ -3,6 +3,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { hobbyApi, categoryApi, wishlistApi } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import HobbyCard from "../components/HobbyCard.jsx";
+import SuggestHobbyModal from "../components/SuggestHobbyModal.jsx";
+import { SkeletonHobbyGrid, SkeletonFilterBar } from "../components/Skeletons.jsx";
 
 const MAX_PRICE = 90_000_000;
 
@@ -36,6 +38,13 @@ function Hobbies() {
   const [priceFilterMax, setPriceFilterMax] = useState(MAX_PRICE);
   const [sortBy, setSortBy] = useState("none");
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [showSuggestModal, setShowSuggestModal] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const addToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   // Load hobbies, categories, and wishlist
   useEffect(() => {
@@ -55,7 +64,7 @@ function Hobbies() {
         setLoading(false);
       }
     };
-    fetchData();
+    void fetchData();
   }, []);
 
   useEffect(() => {
@@ -65,7 +74,6 @@ function Hobbies() {
       .catch(() => setWishlist([]));
   }, [isAuthenticated]);
 
-  // Apply category from URL query param
   useEffect(() => {
     const categoryParam = searchParams.get("category");
     if (categoryParam) setCategoryFilter(categoryParam.toLowerCase());
@@ -96,14 +104,14 @@ function Hobbies() {
     }
 
     filtered = filtered.filter(hobby =>
-      hobby.min_price >= priceFilterMin && hobby.max_price <= priceFilterMax
+      hobby.minPrice >= priceFilterMin && hobby.maxPrice <= priceFilterMax
     );
 
     switch (sortBy) {
       case "nameasc":   filtered.sort((a, b) => a.name.localeCompare(b.name)); break;
       case "namedesc":  filtered.sort((a, b) => b.name.localeCompare(a.name)); break;
-      case "cheap":     filtered.sort((a, b) => a.min_price - b.min_price); break;
-      case "expensive": filtered.sort((a, b) => b.max_price - a.max_price); break;
+      case "cheap":     filtered.sort((a, b) => a.minPrice - b.minPrice); break;
+      case "expensive": filtered.sort((a, b) => b.maxPrice - a.maxPrice); break;
       default: break;
     }
 
@@ -163,8 +171,21 @@ function Hobbies() {
 
         {/* Header & Filters */}
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold">Explore Hobbies</h1>
-          <p className="text-base-content/70">Find your perfect hobby from our curated collection</p>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h1 className="text-3xl font-semibold">Explore Hobbies</h1>
+              <p className="text-base-content/70">Find your perfect hobby from our curated collection</p>
+            </div>
+            {isAuthenticated && (
+              <button
+                type="button"
+                className="btn btn-outline btn-primary gap-2"
+                onClick={() => setShowSuggestModal(true)}
+              >
+                💡 Suggest a Hobby
+              </button>
+            )}
+          </div>
 
           <div className="mt-5">
             <label className="input input-bordered flex items-center gap-2 bg-base-200">
@@ -244,16 +265,19 @@ function Hobbies() {
           )}
         </div>
 
-        {/* Loading / Error */}
-        {loading && (
-          <div className="flex justify-center py-12">
-            <span className="loading loading-spinner loading-lg" />
-          </div>
-        )}
+        {/* Error */}
         {error && <div className="alert alert-error mb-4"><span>{error}</span></div>}
 
         {/* Results */}
-        {!loading && !error && (
+        {loading ? (
+          <>
+            <SkeletonFilterBar />
+            <div className="mt-8">
+              <div className="skeleton h-7 w-48 rounded mb-4" />
+              <SkeletonHobbyGrid count={8} />
+            </div>
+          </>
+        ) : !error && (
           <>
             {savedHobbies.length > 0 && (
               <section className="mb-10">
@@ -285,6 +309,24 @@ function Hobbies() {
           </>
         )}
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="toast toast-top toast-end z-50">
+          <div className={`alert ${toast.type === 'error' ? 'alert-error' : 'alert-success'} shadow-lg cursor-pointer`}
+            onClick={() => setToast(null)}>
+            <span>{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      <SuggestHobbyModal
+        isOpen={showSuggestModal}
+        onClose={() => setShowSuggestModal(false)}
+        onSuccess={(msg) => addToast(msg)}
+        onError={(msg) => addToast(msg, 'error')}
+        categories={categories}
+      />
     </div>
   );
 }

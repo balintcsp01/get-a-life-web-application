@@ -28,9 +28,6 @@ public class HobbyIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private HobbyRepository hobbyRepository;
 
     private Hobby createValidHobby(String name) {
@@ -38,8 +35,8 @@ public class HobbyIntegrationTest {
         hobby.setName(name);
         hobby.setDescription("Fun activity for testing");
         hobby.setDifficulty("EASY");
-        hobby.setMin_price(10);
-        hobby.setMax_price(50);
+        hobby.setMinPrice(10);
+        hobby.setMaxPrice(50);
         return hobbyRepository.save(hobby);
     }
 
@@ -80,12 +77,12 @@ public class HobbyIntegrationTest {
     void testUpdateHobby() {
         Hobby hobby = createValidHobby("Running");
         hobby.setDescription("Outdoor running activity");
-        hobby.setMax_price(70);
+        hobby.setMaxPrice(70);
         hobbyRepository.save(hobby);
 
         Hobby updated = hobbyRepository.findById(hobby.getId()).get();
         assertEquals("Outdoor running activity", updated.getDescription());
-        assertEquals(70, updated.getMax_price());
+        assertEquals(70, updated.getMaxPrice());
     }
 
     @Test
