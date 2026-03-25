@@ -9,6 +9,9 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
+    allowedHosts: [
+      'get-a-life-frontend.onrender.com'
+    ],
     proxy: {
       '/api': {
         target: process.env.VITE_BACKEND_URL || 'http://localhost:8080',
