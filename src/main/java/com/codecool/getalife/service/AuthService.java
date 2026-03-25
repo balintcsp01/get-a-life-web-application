@@ -50,8 +50,8 @@ public class AuthService {
                 .hobbies(new HashSet<>())
                 .build());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user.getEmail(), null, user.getAuthorities()
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
         return toAuthResponse(user, authentication);
