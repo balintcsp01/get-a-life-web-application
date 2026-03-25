@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -46,9 +47,9 @@ public class AuthService {
                 .email(request.email())
                 .password_hash(passwordEncoder.encode(request.password()))
                 .roles(Set.of("USER"))
+                .hobbies(new HashSet<>())
                 .build());
 
-        // Authenticate directly instead of going through login() to avoid a redundant DB lookup
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 user.getEmail(), null, user.getAuthorities()
         );

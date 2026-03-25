@@ -46,7 +46,6 @@ function Hobbies() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  // Load hobbies, categories, and wishlist
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -79,7 +78,6 @@ function Hobbies() {
     if (categoryParam) setCategoryFilter(categoryParam.toLowerCase());
   }, [searchParams]);
 
-  // Filter + sort
   useEffect(() => {
     let filtered = [...hobbies];
 
@@ -130,19 +128,22 @@ function Hobbies() {
       navigate("/login", { state: { backgroundLocation: { pathname: "/hobbies" } } });
       return;
     }
-    const currentlySaved = wishlist.includes(Number(hobbyId));
-    setWishlist(prev =>
-      currentlySaved ? prev.filter(id => id !== Number(hobbyId)) : [...prev, Number(hobbyId)]
-    );
+    let wasSaved;
+    setWishlist(prev => {
+      wasSaved = prev.includes(Number(hobbyId));
+      return wasSaved
+        ? prev.filter(id => id !== Number(hobbyId))
+        : [...prev, Number(hobbyId)];
+    });
     try {
-      if (currentlySaved) await wishlistApi.remove(hobbyId);
+      if (wasSaved) await wishlistApi.remove(hobbyId);
       else await wishlistApi.add(hobbyId);
     } catch {
       setWishlist(prev =>
-        currentlySaved ? [...prev, Number(hobbyId)] : prev.filter(id => id !== Number(hobbyId))
+        wasSaved ? [...prev, Number(hobbyId)] : prev.filter(id => id !== Number(hobbyId))
       );
     }
-  }, [isAuthenticated, wishlist, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const isSaved = (hobbyId) => wishlist.includes(Number(hobbyId));
 
