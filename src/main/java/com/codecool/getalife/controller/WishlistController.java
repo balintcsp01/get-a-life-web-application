@@ -24,12 +24,12 @@ public class WishlistController {
     }
 
     @PostMapping("/{hobbyId}")
-    public ResponseEntity<Void> addToWishlist(
+    public ResponseEntity<HobbyIdResponse> addToWishlist(
             @AuthenticationPrincipal String email,
             @PathVariable Long hobbyId
     ) {
         wishlistService.addToWishlist(email, hobbyId);
-        return ResponseEntity.status(201).build();
+        return ResponseEntity.status(201).body(new HobbyIdResponse(hobbyId));
     }
 
     @DeleteMapping("/{hobbyId}")
