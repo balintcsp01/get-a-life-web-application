@@ -24,7 +24,7 @@ public class CategoryService {
     private final HobbyRepository hobbyRepository;
 
     public CategoryNameResponse get(Long id) {
-        var category = categoryRepository.findById(id).orElseThrow(
+        Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new CategoryNotFoundException(id.toString())
         );
 
@@ -61,7 +61,7 @@ public class CategoryService {
     }
 
     public void delete(Long id) {
-        var category = categoryRepository.findById(id)
+        Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException(id.toString()));
 
         List<String> assignedHobbies = hobbyRepository.findByCategoriesId(id)
