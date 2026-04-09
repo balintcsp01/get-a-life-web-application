@@ -99,9 +99,33 @@ flowchart TD
 
 ---
 
-## 🚀 Getting Started (Coming Soon)
+## 🚀 Getting Started
+These instructions will help you run the project locally.
 
-Setup instructions, environment variables, and local development guides will be added as the project progresses.
+### Prerequisites
+
+Make sure you have installed the following:
+
+- [Java JDK](https://www.oracle.com/java/technologies/javase-downloads.html)
+- [Maven](https://maven.apache.org/install.html)
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Running the Project
+
+1. **Build the project with Maven:**
+
+```bash
+mvn clean install
+
+2. **Start the project using Docker Compose:**
+docker-compose up --build
+This will build and start all required services.
+
+CI/CD
+The project includes a CI/CD pipeline that automatically builds and tests the application on each commit. You don’t need to run anything manually for continuous integration, but you can run the above steps to start the project locally.
+
+Or just open on website on Render: https://get-a-life-frontend.onrender.com
 
 ---
 
