@@ -74,7 +74,9 @@ This platform is not just about killing time — it’s about **building a life 
 - **Java**
 - **Spring Web**
 - **Spring Data JPA**
+- **Spring Security**
 - **PostgreSQL**
+- **Docker**
 
 ---
 
@@ -108,9 +110,6 @@ Setup instructions, environment variables, and local development guides will be 
 🟡 **In active development**
 
 Planned next steps:
-- Authentication & user profiles
-- Hobby CRUD system
-- Wishlist functionality
 - Community features
 - UI/UX polish
 
